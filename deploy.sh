@@ -4,21 +4,9 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-ROOT_BUCKET="s3://charlyfive.com"
-ROOT_DIST_ID="E26PQG4673CM90"
+ROOT_BUCKET="s3://carlosbustamante.dev"
+ROOT_DIST_ID="E6VISQC42W7BR"
 ROOT_DIR="sites/root/"
-
-MUSIC_BUCKET="s3://music.charlyfive.com"
-MUSIC_DIST_ID="E112XZFNH4GRX0"
-MUSIC_DIR="sites/music/"
-
-PORTFOLIO_BUCKET="s3://portfolio.charlyfive.com"
-PORTFOLIO_DIST_ID="E1N5DOECVPGRB1"
-PORTFOLIO_DIR="sites/portfolio/"
-
-STREAM_BUCKET="s3://stream.charlyfive.com"
-STREAM_DIST_ID="E3FHHIAEEDEKCZ"
-STREAM_DIR="sites/stream/"
 
 deploy_site() {
     local SITE_NAME=$1
@@ -40,25 +28,13 @@ deploy_site() {
 
 case "$1" in
     root)
-        deploy_site "Gateway (Root)" $ROOT_DIR $ROOT_BUCKET $ROOT_DIST_ID
-        ;;
-    music)
-        deploy_site "Music Site" $MUSIC_DIR $MUSIC_BUCKET $MUSIC_DIST_ID
-        ;;
-    portfolio)
-        deploy_site "Portfolio" $PORTFOLIO_DIR $PORTFOLIO_BUCKET $PORTFOLIO_DIST_ID
-        ;;
-    stream)
-        deploy_site "Stream Site" $STREAM_DIR $STREAM_BUCKET $STREAM_DIST_ID
+        deploy_site "Portfolio" $ROOT_DIR $ROOT_BUCKET $ROOT_DIST_ID
         ;;
     all)
-        deploy_site "Gateway (Root)" $ROOT_DIR $ROOT_BUCKET $ROOT_DIST_ID
-        deploy_site "Music Site" $MUSIC_DIR $MUSIC_BUCKET $MUSIC_DIST_ID
-        deploy_site "Portfolio" $PORTFOLIO_DIR $PORTFOLIO_BUCKET $PORTFOLIO_DIST_ID
-        deploy_site "Stream Site" $STREAM_DIR $STREAM_BUCKET $STREAM_DIST_ID
+        deploy_site "Portfolio" $ROOT_DIR $ROOT_BUCKET $ROOT_DIST_ID
         ;;
     *)
-        echo "Usage: ./deploy.sh [root|music|portfolio|stream|all]"
+        echo "Usage: ./deploy.sh [root|all]"
         exit 1
         ;;
 esac
