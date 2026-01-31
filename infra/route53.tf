@@ -2,6 +2,7 @@ data "aws_route53_zone" "main" {
   name = var.root_domain
 }
 
+# DNS records for content sites
 resource "aws_route53_record" "content" {
   for_each = local.content_sites
   zone_id  = data.aws_route53_zone.main.zone_id
@@ -15,6 +16,7 @@ resource "aws_route53_record" "content" {
   }
 }
 
+# DNS record for www redirect
 resource "aws_route53_record" "www" {
   zone_id = data.aws_route53_zone.main.zone_id
   name    = "www.${var.root_domain}"

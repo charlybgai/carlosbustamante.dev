@@ -1,7 +1,7 @@
 variable "project_name" {
   description = "Project name for tagging"
   type        = string
-  default     = "charlyfive-websites"
+  default     = "carlosbustamante-portfolio"
 }
 
 variable "root_domain" {
@@ -17,4 +17,5 @@ variable "certificate_arn" {
 variable "subdomains" {
   description = "Map of subdomains to create"
   type        = map(string)
+  default     = {}
 }

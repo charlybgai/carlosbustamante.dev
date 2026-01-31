@@ -1,5 +1,6 @@
+# CloudFront function to rewrite requests to index.html
 resource "aws_cloudfront_function" "rewrite_index" {
-  name    = "rewrite-index-html"
+  name    = "carlosbustamante-rewrite-index-html"
   runtime = "cloudfront-js-1.0"
   comment = "Appends index.html to directory requests for SPA/Static sites"
   publish = true
@@ -20,6 +21,7 @@ function handler(event) {
 EOF
 }
 
+# Origin Access Control for S3 content buckets
 resource "aws_cloudfront_origin_access_control" "content" {
   for_each                          = local.content_sites
   name                              = "${each.value}-oac"
@@ -28,6 +30,7 @@ resource "aws_cloudfront_origin_access_control" "content" {
   signing_protocol                  = "sigv4"
 }
 
+# CloudFront distribution for content site
 resource "aws_cloudfront_distribution" "content" {
   for_each            = local.content_sites
   enabled             = true
@@ -73,6 +76,7 @@ resource "aws_cloudfront_distribution" "content" {
   }
 }
 
+# CloudFront distribution for www redirect
 resource "aws_cloudfront_distribution" "www" {
   enabled         = true
   is_ipv6_enabled = true

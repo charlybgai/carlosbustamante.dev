@@ -1,15 +1,13 @@
-# Charlyfive Websites
+# Carlos Bustamante - ML Engineer Portfolio
 
-This monorepo contains the source code and infrastructure for the **Charlyfive** personal brand websites, hosted under the `charlyfive.com` domain.
+Personal portfolio website for **Carlos Bustamante**, Machine Learning Engineer, hosted at `carlosbustamante.dev`.
 
 ## Project Structure
 
 ```
-website/
+carlosbustamante.dev/
 ├── sites/
-│   ├── root/        # Gateway landing page (charlyfive.com)
-│   ├── portfolio/   # ML Engineer portfolio (portfolio.charlyfive.com)
-│   └── music/       # Music producer EPK (music.charlyfive.com)
+│   └── root/        # ML Engineer portfolio (carlosbustamante.dev)
 ├── infra/           # Terraform infrastructure (AWS S3, CloudFront, Route 53)
 └── deploy.sh        # Deployment script
 ```
@@ -18,9 +16,8 @@ website/
 
 | Site | URL | Description |
 |------|-----|-------------|
-| **Gateway** | [charlyfive.com](https://charlyfive.com) | Split-screen landing page directing users to Portfolio or Music sites |
-| **Portfolio** | [portfolio.charlyfive.com](https://portfolio.charlyfive.com) | Machine Learning Engineer portfolio showcasing projects, certifications, and experience |
-| **Music** | [music.charlyfive.com](https://music.charlyfive.com) | Electronic Music Producer EPK with releases, remixes, and social links |
+| **Portfolio** | [carlosbustamante.dev](https://carlosbustamante.dev) | Machine Learning Engineer portfolio showcasing projects, certifications, and experience |
+| **WWW** | [www.carlosbustamante.dev](https://www.carlosbustamante.dev) | Redirects to main site |
 
 ## Technologies
 
@@ -28,7 +25,7 @@ website/
 - **HTML5** - Semantic structure
 - **SCSS/CSS** - Styling with variables and modern design patterns
 - **JavaScript** - Interactivity and animations
-- **Bootstrap 5** - Grid system (Portfolio site)
+- **Bootstrap 5** - Grid system
 
 ### Infrastructure
 - **Terraform** - Infrastructure as Code
@@ -38,16 +35,23 @@ website/
 
 ## Deployment
 
-Deploy individual sites or all at once using the deploy script:
+Deploy the portfolio site:
 
 ```bash
-# Deploy individual sites
-./deploy.sh root       # Gateway
-./deploy.sh music      # Music EPK
-./deploy.sh portfolio  # Portfolio
-
-# Deploy all sites
+./deploy.sh root
+# or
 ./deploy.sh all
+```
+
+## Infrastructure
+
+Initialize and apply Terraform:
+
+```bash
+cd infra
+terraform init
+terraform plan
+terraform apply
 ```
 
 ## Acknowledgements
