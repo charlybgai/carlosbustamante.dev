@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://portfolio.charlyfive.com/sitemap.xml
+Sitemap: https://carlosbustamante.dev/sitemap.xml
 Crawl-delay: 1
