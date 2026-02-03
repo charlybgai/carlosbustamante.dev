@@ -39,4 +39,18 @@
         background: color.adjust($secondary, $lightness: 10%);
         box-shadow: 0 6px 20px rgba($secondary, 0.4);
     }
+
+    // Outlined variant for secondary actions
+    &.btn-outline {
+        background: transparent;
+        border: 2px solid $primary;
+        color: $primary !important;
+        box-shadow: none;
+
+        &:hover {
+            background: $primary;
+            color: #fff !important;
+            box-shadow: 0 6px 20px rgba($primary, 0.4);
+        }
+    }
 }

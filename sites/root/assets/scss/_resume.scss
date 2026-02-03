@@ -30,15 +30,16 @@
             left: 15px;
             top: 0;
             bottom: 0;
-            width: 2px;
-            background: rgba($primary, 0.2);
+            width: 3px;
+            background: linear-gradient(to bottom, $primary, rgba($primary, 0.2));
         }
 
         .item {
             position: relative;
             margin-bottom: 3rem;
 
-            &:last-child, &.last {
+            &:last-child,
+            &.last {
                 margin-bottom: 0;
             }
 

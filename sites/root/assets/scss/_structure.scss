@@ -1,13 +1,13 @@
 main {
-    padding-left: 102px;
+    padding-left: 80px;
     width: 100%;
-    min-height: 100vh;
+    min-height: 100dvh; // Use dynamic viewport height
     background: $dark_bg;
 
     > section {
         display: none;
         width: 100%;
-        min-height: 100vh;
+        min-height: 100dvh; // Use dynamic viewport height
         padding: 80px 40px;
         position: relative;
         opacity: 0;

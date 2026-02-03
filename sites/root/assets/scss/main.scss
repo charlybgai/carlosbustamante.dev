@@ -17,3 +17,50 @@
 @import "./contact";
 
 @import "./responsive";
+
+// Accessibility: Focus styles for keyboard navigation
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 2px;
+}
+
+// Scroll-to-top button
+.scroll-top {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 45px;
+    height: 45px;
+    background: $primary;
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    box-shadow: 0 4px 14px rgba($primary, 0.3);
+
+    &.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba($primary, 0.4);
+    }
+
+    @media (max-width: 991px) {
+        bottom: 80px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+    }
+}
