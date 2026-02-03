@@ -1,6 +1,6 @@
 #contact_me {
     background: $dark_bg;
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
 
@@ -26,8 +26,8 @@
                 width: 100%;
                 padding: 14px 16px;
                 border-radius: 12px;
-                border: 1px solid rgba($gray, 0.15);
-                background: rgba(255,255,255,0.04);
+                border: 1px solid rgba($gray, 0.3);
+                background: rgba(255, 255, 255, 0.04);
                 color: $text_main;
                 font-family: $font_main;
                 transition: all 0.3s ease;
@@ -35,7 +35,7 @@
                 &:focus {
                     outline: none;
                     border-color: $primary;
-                    background: rgba(255,255,255,0.07);
+                    background: rgba(255, 255, 255, 0.07);
                     box-shadow: 0 0 0 4px rgba($primary, 0.1);
                 }
             }
@@ -46,7 +46,8 @@
             }
         }
 
-        .form-success, .form-error {
+        .form-success,
+        .form-error {
             padding: 2rem;
             border-radius: 12px;
             background: rgba($primary, 0.05);
@@ -66,7 +67,7 @@
             display: flex;
             align-items: center;
             gap: 1.5rem;
-            
+
             i {
                 color: $primary;
                 font-size: 1.5rem;
@@ -89,7 +90,8 @@
                     margin-bottom: 4px;
                 }
 
-                p, a {
+                p,
+                a {
                     margin: 0;
                     font-size: 1.1rem;
                     font-weight: 500;

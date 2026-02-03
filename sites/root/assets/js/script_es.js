@@ -1,3 +1,15 @@
+// Initialize page - hide all inactive sections immediately to prevent layout calculation issues
+document.querySelectorAll('main > section:not(.active)').forEach(section => {
+    section.style.display = 'none';
+});
+
+// Also ensure active section is properly displayed
+const activeSection = document.querySelector('main > section.active');
+if (activeSection) {
+    activeSection.style.display = 'block';
+    activeSection.style.opacity = '1';
+}
+
 let navLinks = document.querySelectorAll('a.inner-link');
 
 navLinks.forEach((item) => {
@@ -171,4 +183,29 @@ function trapFocus(e) {
     if (modal.contains(e.target)) return;
     const focusable = modal.querySelectorAll('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
     if (focusable.length) { focusable[0].focus(); e.preventDefault(); }
+}
+
+// Scroll-to-top button functionality
+const scrollTopBtn = document.getElementById('scrollTop');
+if (scrollTopBtn) {
+    // Check scroll position - works for both window scroll and section scroll
+    function checkScrollPosition() {
+        const scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollY > 300) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
+    }
+
+    // Listen to scroll on window
+    window.addEventListener('scroll', checkScrollPosition);
+    // Also listen to scroll on document for broader compatibility
+    document.addEventListener('scroll', checkScrollPosition);
+
+    scrollTopBtn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    });
 }
