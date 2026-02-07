@@ -1,3 +1,8 @@
+variable "gcp_project_id" {
+  description = "GCP project ID for reCAPTCHA Enterprise"
+  type        = string
+}
+
 variable "project_name" {
   description = "Project name for tagging"
   type        = string

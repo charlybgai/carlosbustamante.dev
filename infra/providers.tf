@@ -4,9 +4,18 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
   }
 }
 
 provider "aws" {
   region = "us-east-1"
+}
+
+provider "google" {
+  project = var.gcp_project_id
+  region  = "us-central1"
 }
