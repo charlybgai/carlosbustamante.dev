@@ -22,3 +22,9 @@ output "cloudfront_domain_names" {
   description = "Domain names of CloudFront distributions"
   value       = { for k, v in aws_cloudfront_distribution.content : k => v.domain_name }
 }
+
+# GCP reCAPTCHA Enterprise
+output "recaptcha_site_key" {
+  description = "reCAPTCHA Enterprise site key for frontend use"
+  value       = google_recaptcha_enterprise_key.portfolio_contact_form.name
+}
