@@ -1,13 +1,13 @@
-# Carlos Bustamante - ML Engineer Portfolio
+# Carlos Bustamante - Cloud & MLOps Engineer Portfolio
 
-Personal portfolio website for **Carlos Bustamante**, Machine Learning Engineer, hosted at `carlosbustamante.dev`.
+Personal portfolio website for **Carlos Bustamante**, Cloud & MLOps Engineer, hosted at `carlosbustamante.dev`.
 
 ## Project Structure
 
 ```
 carlosbustamante.dev/
 ├── sites/
-│   └── root/        # ML Engineer portfolio (carlosbustamante.dev)
+│   └── root/        # Cloud & MLOps portfolio (carlosbustamante.dev)
 ├── infra/           # Terraform infrastructure (AWS S3, CloudFront, Route 53)
 └── deploy.sh        # Deployment script
 ```
@@ -16,7 +16,7 @@ carlosbustamante.dev/
 
 | Site | URL | Description |
 |------|-----|-------------|
-| **Portfolio** | [carlosbustamante.dev](https://carlosbustamante.dev) | Machine Learning Engineer portfolio showcasing projects, certifications, and experience |
+| **Portfolio** | [carlosbustamante.dev](https://carlosbustamante.dev) | Cloud & MLOps Engineer portfolio showcasing projects, certifications, and experience |
 | **WWW** | [www.carlosbustamante.dev](https://www.carlosbustamante.dev) | Redirects to main site |
 
 ## Technologies
