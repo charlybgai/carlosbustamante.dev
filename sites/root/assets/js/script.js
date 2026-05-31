@@ -56,7 +56,8 @@ document.querySelector('#sidebar .toggle-sidebar').addEventListener('click', fun
 });
 
 var options = {
-    strings: ['Machine Learning Engineer', 'Data Scientist', 'AI Specialist'],
+    strings: ['Cloud & MLOps Engineer', 'Machine Learning Engineer', 'AI Infrastructure Engineer'],
+    contentType: null,
     loop: true,
     typeSpeed: 80,
     backSpeed: 10
