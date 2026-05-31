@@ -88,22 +88,41 @@ function workFilter(event) {
 var workModal = new bootstrap.Modal(document.getElementById('workModal'));
 const workElements = document.querySelectorAll("#my_work .work-items .wrap");
 
-workElements.forEach((item) => {
-    item.addEventListener('click', function () {
-        document.querySelector('#workModal .modal-body img').setAttribute('src', item.getAttribute('data-image'));
-        document.querySelector('#workModal .modal-body .title').innerText = item.getAttribute('data-title');
-        document.querySelector('#workModal .modal-body .description').innerText = item.getAttribute('data-description');
-        document.querySelector('#workModal .modal-body .type .value').innerText = item.getAttribute('data-type');
-        document.querySelector('#workModal .modal-body .completed .value').innerText = item.getAttribute('data-completed');
-        document.querySelector('#workModal .modal-body .skills .value').innerText = item.getAttribute('data-skills');
-        document.querySelector('#workModal .modal-body .project-link a').setAttribute('href', item.getAttribute('data-project-link'));
+function openWorkModal(item) {
+    const title = item.getAttribute('data-title');
+    const modalImage = document.querySelector('#workModal .modal-body img');
 
-        workModal.show();
-        // focus management: move focus to close button for accessibility
-        setTimeout(() => {
-            const closeBtn = document.querySelector("#workModal .modal-close-button");
-            if (closeBtn) closeBtn.focus();
-        }, 200);
+    modalImage.setAttribute('src', item.getAttribute('data-image'));
+    modalImage.setAttribute('alt', title);
+    document.querySelector('#workModal .modal-body .title').innerText = title;
+    document.querySelector('#workModal .modal-body .description').innerText = item.getAttribute('data-description');
+    document.querySelector('#workModal .modal-body .type .value').innerText = item.getAttribute('data-type');
+    document.querySelector('#workModal .modal-body .completed .value').innerText = item.getAttribute('data-completed');
+    document.querySelector('#workModal .modal-body .skills .value').innerText = item.getAttribute('data-skills');
+    document.querySelector('#workModal .modal-body .project-link a').setAttribute('href', item.getAttribute('data-project-link'));
+
+    workModal.show();
+    // focus management: move focus to close button for accessibility
+    setTimeout(() => {
+        const closeBtn = document.querySelector("#workModal .modal-close-button");
+        if (closeBtn) closeBtn.focus();
+    }, 200);
+}
+
+workElements.forEach((item) => {
+    item.setAttribute('role', 'button');
+    item.setAttribute('tabindex', '0');
+    item.setAttribute('aria-label', `Abrir detalles del proyecto: ${item.getAttribute('data-title')}`);
+
+    item.addEventListener('click', function () {
+        openWorkModal(item);
+    });
+
+    item.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            openWorkModal(item);
+        }
     });
 });
 
@@ -138,8 +157,8 @@ contactFromItems.forEach((item) => {
 function onSubmit(e) {
     e.preventDefault();
 
-    grecaptcha.ready(function () {
-        grecaptcha.execute('6LdBoB8qAAAAAHqcXpmWKGEV2CrpMJGJrHjUv1PU', { action: 'submit' }).then(function (token) {
+    grecaptcha.enterprise.ready(function () {
+        grecaptcha.enterprise.execute('6LdBoB8qAAAAAHqcXpmWKGEV2CrpMJGJrHjUv1PU', { action: 'submit' }).then(function (token) {
             const data = {
                 name: document.getElementById("name").value,
                 email: document.getElementById("email").value,
@@ -155,13 +174,19 @@ function onSubmit(e) {
                 },
                 body: JSON.stringify(data)
             })
-                .then(response => response.json())
+                .then(async response => {
+                    const responseData = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(responseData.message || `Request failed with status ${response.status}`);
+                    }
+                    return responseData;
+                })
                 .then(data => {
                     console.log("Response data:", data);
                     document.querySelector('.form').innerHTML = `
                         <div class="text-center form-success">
-                            <h3>Thank you for your message!</h3>
-                            <p>Your message has been sent successfully. A response will be provided shortly.</p>
+                            <h3>Gracias por tu mensaje.</h3>
+                            <p>Tu mensaje se envió correctamente. Recibirás una respuesta pronto.</p>
                         </div>
                     `;
                 })
@@ -169,8 +194,8 @@ function onSubmit(e) {
                     console.error("Error:", error);
                     document.querySelector('.form').innerHTML = `
                         <div class="text-center form-error">
-                            <h3>An error occurred!</h3>
-                            <p>There was an issue sending your message. Please try again later.</p>
+                            <h3>Ocurrió un error.</h3>
+                            <p>${error.message || 'Hubo un problema al enviar tu mensaje. Inténtalo de nuevo más tarde.'}</p>
                         </div>
                     `;
                 });
