@@ -30,6 +30,48 @@ resource "aws_cloudfront_origin_access_control" "content" {
   signing_protocol                  = "sigv4"
 }
 
+resource "aws_cloudfront_response_headers_policy" "security" {
+  name    = "carlosbustamante-security-headers"
+  comment = "Security headers for carlosbustamante.dev"
+
+  security_headers_config {
+    content_type_options {
+      override = true
+    }
+
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+
+    referrer_policy {
+      referrer_policy = "strict-origin-when-cross-origin"
+      override        = true
+    }
+
+    strict_transport_security {
+      access_control_max_age_sec = 31536000
+      include_subdomains         = true
+      preload                    = true
+      override                   = true
+    }
+
+    xss_protection {
+      mode_block = true
+      protection = true
+      override   = true
+    }
+  }
+
+  custom_headers_config {
+    items {
+      header   = "Permissions-Policy"
+      value    = "camera=(), geolocation=(), microphone=()"
+      override = true
+    }
+  }
+}
+
 # CloudFront distribution for content site
 resource "aws_cloudfront_distribution" "content" {
   for_each            = local.content_sites
@@ -54,10 +96,11 @@ resource "aws_cloudfront_distribution" "content" {
       cookies { forward = "none" }
     }
 
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    viewer_protocol_policy     = "redirect-to-https"
+    min_ttl                    = 0
+    default_ttl                = 3600
+    max_ttl                    = 86400
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
 
     function_association {
       event_type   = "viewer-request"
@@ -104,11 +147,12 @@ resource "aws_cloudfront_distribution" "www" {
       cookies { forward = "none" }
     }
 
-    viewer_protocol_policy = "redirect-to-https"
+    viewer_protocol_policy     = "redirect-to-https"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
   }
 
   viewer_certificate {
-    acm_certificate_arn      = var.certificate_arn
+    acm_certificate_arn      = coalesce(var.www_certificate_arn, var.certificate_arn)
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
