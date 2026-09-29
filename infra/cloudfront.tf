@@ -21,6 +21,10 @@ function handler(event) {
 EOF
 }
 
+data "aws_cloudfront_cache_policy" "caching_optimized" {
+  name = "Managed-CachingOptimized"
+}
+
 # Origin Access Control for S3 content buckets
 resource "aws_cloudfront_origin_access_control" "content" {
   for_each                          = local.content_sites
@@ -55,12 +59,6 @@ resource "aws_cloudfront_response_headers_policy" "security" {
       preload                    = true
       override                   = true
     }
-
-    xss_protection {
-      mode_block = true
-      protection = true
-      override   = true
-    }
   }
 
   custom_headers_config {
@@ -91,20 +89,29 @@ resource "aws_cloudfront_distribution" "content" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "S3-${each.value}"
 
-    forwarded_values {
-      query_string = false
-      cookies { forward = "none" }
-    }
-
+    # AWS managed "CachingOptimized": no query strings or cookies in the cache key (same as the
+    # old legacy settings), Gzip and Brotli enabled, default TTL 1 day. deploy.sh invalidates
+    # /* on every deploy, so the longer TTL doesn't serve stale files.
+    cache_policy_id            = data.aws_cloudfront_cache_policy.caching_optimized.id
+    compress                   = true
     viewer_protocol_policy     = "redirect-to-https"
-    min_ttl                    = 0
-    default_ttl                = 3600
-    max_ttl                    = 86400
     response_headers_policy_id = aws_cloudfront_response_headers_policy.security.id
 
     function_association {
       event_type   = "viewer-request"
       function_arn = aws_cloudfront_function.rewrite_index.arn
+    }
+  }
+
+  # A missing object in the private bucket comes back from S3 as 403 (CloudFront has no
+  # s3:ListBucket), so both codes are answered with the bilingual 404 page and a real 404.
+  dynamic "custom_error_response" {
+    for_each = [403, 404]
+    content {
+      error_code            = custom_error_response.value
+      response_code         = 404
+      response_page_path    = "/404.html"
+      error_caching_min_ttl = 60
     }
   }
 
