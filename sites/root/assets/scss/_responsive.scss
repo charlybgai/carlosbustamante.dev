@@ -1,188 +1,213 @@
-// Ultra-wide screens - ensure content stays centered
-@media (min-width: 1920px) {
-    main>section {
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-    }
-}
+@use "colors" as *;
+@use "mixins" as *;
 
-// Large desktops
-@media (max-width: 1400px) {
-    #about_me {
-        .hero {
-            .image img {
-                max-width: 350px;
-            }
-        }
-    }
-}
-
-// Medium desktops - fix About Me overlap
-@media (max-width: 1200px) {
-    #home {
-        .info {
-            h1 {
-                font-size: 3rem;
-            }
-        }
-    }
-
-    #about_me {
-        .hero {
-            .image {
-                order: 2; // Move image below on medium screens
-
-                img {
-                    max-width: 300px;
-                    margin-top: 2rem;
-                }
-            }
-
-            .info {
-                order: 1;
-            }
-        }
-
-        .languages-skills {
-            .languages-key-skills {
-                margin-bottom: 2rem;
-            }
-        }
-    }
-}
-
-@media (max-width: 991px) {
-    #sidebar {
-        position: fixed;
-        bottom: 0;
-        top: auto;
+// Small and mid desktops (992–1439px): the portrait column is narrow, so both result cards stack in
+// one column at the portrait's lower left instead of being staggered. Stacking with flex means
+// they can't overlap each other, whatever the label length.
+@media (min-width: $bp_lg) and (max-width: 1439.98px) {
+    #home .metrics {
+        position: absolute;
         left: 0;
-        width: 100%;
-        height: auto;
-        min-height: 60px;
-        border-right: none;
-        border-top: 1px solid rgba($gray, 0.1);
-        padding: 0;
-        flex-direction: row;
-        justify-content: center;
-        background: rgba(color.adjust($dark_bg, $lightness: 3%), 0.95);
-        backdrop-filter: blur(10px);
+        bottom: -6%; // straddles the portrait's bottom edge, so the cards stay below the face
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        width: min(220px, 62%);
 
-        .logo {
-            display: none;
+        .metric {
+            position: static;
+            max-width: none;
+            padding: 0.75rem 0.95rem;
         }
 
-        .language-switch {
-            display: none;
+        .value {
+            font-size: 1.15rem;
         }
 
-        nav {
-            height: 100%;
-
-            ul {
-                flex-direction: row;
-                height: 100%;
-                gap: 0;
-                justify-content: space-around;
-
-                li {
-                    height: 100%;
-
-                    a {
-                        height: 100%;
-                        border-radius: 0;
-                        width: 50px;
-                    }
-
-                    >span {
-                        display: none;
-                    }
-
-                    // Hide tooltips on mobile
-                }
-            }
+        .label {
+            font-size: 0.76rem;
         }
     }
+}
 
+// Short desktop screens (e.g. 1280x720): tighten the hero so the social links stay above the fold
+@media (min-width: $bp_lg) and (max-height: 820px) {
+    #home {
+        padding-top: 40px;
+        padding-bottom: 40px;
+
+        .status-pill {
+            margin-bottom: 1.1rem;
+        }
+
+        h1 {
+            margin-bottom: 0.9rem;
+            font-size: clamp(2.4rem, 1.2rem + 3vw, 3.6rem);
+        }
+
+        .role {
+            margin-bottom: 1rem;
+        }
+
+        .intro {
+            margin-bottom: 1.25rem;
+        }
+
+        .stack {
+            margin-bottom: 1.5rem;
+        }
+
+        .cta {
+            margin-bottom: 1.5rem;
+        }
+    }
+}
+
+// Tablet and mobile: bottom bar replaces the rail (see _sidebar.scss)
+@include below($bp_lg) {
     main {
         padding-left: 0;
-        padding-bottom: 90px; // Space for bottom bar with extra safety margin
 
-        >section {
-            padding-left: 20px;
-            padding-right: 20px;
+        > section {
+            padding: 56px 20px 48px;
         }
     }
 
+    .site-footer {
+        margin-left: 0;
+        padding: 1.5rem 20px calc(#{$bar_height} + 1.5rem + env(safe-area-inset-bottom));
+    }
+
+    // Tapping the active item in the bottom bar already returns to the top,
+    // and a floating button here would sit on top of content
+    .scroll-top {
+        display: none;
+    }
+
     #home {
-        text-align: center;
-        min-height: calc(100dvh - 90px); // Account for bottom nav
+        padding-top: 32px;
+        padding-bottom: 32px;
 
-        .info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 2rem;
-
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            p {
-                margin: 0 auto 2rem;
-            }
+        .avatar {
+            display: block;
+            width: 72px;
+            height: 72px;
+            margin-bottom: 1.25rem;
         }
 
-        .image {
-            display: none; // Better ux for mobile hero
+        .status-pill {
+            margin-bottom: 1.25rem;
+        }
+
+        .role {
+            min-height: 0;
+            margin-bottom: 1.1rem;
+            font-size: 0.95rem;
+        }
+
+        .intro {
+            margin-bottom: 1.25rem;
+            font-size: 1.05rem;
+        }
+
+        .stack {
+            margin-bottom: 1.5rem;
+        }
+
+        .cta {
+            margin-bottom: 1.75rem;
+        }
+
+        .hero-visual {
+            display: block;
+        }
+
+        .portrait {
+            display: none;
+        }
+
+        // Result cards become a static two-column grid
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+
+            .metric {
+                position: static;
+                max-width: none;
+            }
         }
     }
 
     #about_me {
-        .hero {
-            flex-direction: column;
-            text-align: center;
-
-            .info .buttons {
-                justify-content: center;
-            }
-
-            .info .items .item {
-                justify-content: center;
-            }
-        }
-
-        .languages-skills .custom h2 {
-            text-align: center;
-
-            &:after {
-                left: 50%;
-                transform: translateX(-50%);
-            }
+        .about-photo {
+            max-width: 300px;
+            // Offset the photo by half of its decorative frame offset so the pair looks centered
+            transform: translateX(-9px);
         }
     }
 }
 
-@media (max-width: 576px) {
+@include below($bp_md) {
+    #contact_me .contact-card {
+        padding: 1.5rem;
+    }
+
+    #workModal .modal-inner {
+        padding: 1.25rem 1.25rem 1.5rem;
+    }
+}
+
+@include below($bp_sm) {
     #home {
-        h1 {
-            font-size: 2rem;
+        .cta > * {
+            flex: 1 1 auto;
         }
 
-        .field h2 {
-            font-size: 1.2rem;
+        .metrics {
+            grid-template-columns: 1fr;
         }
     }
 
-    #about_me .hero .info .buttons {
-        flex-direction: column;
-        width: 100%;
+    #about_me {
+        .facts {
+            grid-template-columns: 1fr;
+        }
 
-        .btn-custom-blue,
-        .btn-custom-dark {
+        .buttons > * {
+            flex: 1 1 auto;
+        }
+    }
+
+    #contact_me {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions .btn-custom-blue {
             width: 100%;
         }
+    }
+
+    // Same 2x2 layout in both languages
+    #my_work .filters {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+// Very narrow phones: a wrapped role line needs room so the layout doesn't jump while typing
+@media (max-width: 379.98px) {
+    #home .role {
+        min-height: 2.6rem;
+        align-items: flex-start;
+    }
+}
+
+// Short phones: drop the avatar so the main CTA stays above the bottom bar on first view
+@media (max-width: 991.98px) and (max-height: 760px) {
+    #home .avatar {
+        display: none;
     }
 }

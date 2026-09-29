@@ -1,15 +1,25 @@
-* {
-    margin: 0;
-    padding: 0;
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
-html, body {
-    overflow-x: hidden;
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+// `clip` (not `hidden`) so `position: sticky` keeps working
+html,
+body {
+    overflow-x: clip;
+}
+
+body {
     min-height: 100dvh;
 }
 
-ul {
+ul,
+ol {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -21,7 +31,15 @@ h3,
 h4,
 h5,
 h6,
-p {
+p,
+figure,
+dl,
+dd {
     margin: 0;
     padding: 0;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
 }

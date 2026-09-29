@@ -1,237 +1,463 @@
-// Initialize page - hide all inactive sections immediately to prevent layout calculation issues
-document.querySelectorAll('main > section:not(.active)').forEach(section => {
-    section.style.display = 'none';
-});
+/*
+ * carlosbustamante.dev: shared script for the English (/) and Spanish (/es/) pages.
+ *
+ * - The language comes from <html lang>. All UI strings live in STRINGS below.
+ * - The API endpoint is the contact form's `action` attribute and the reCAPTCHA
+ *   site key is its `data-recaptcha-key` attribute, so there are no URLs or keys here.
+ * - Sections are shown one at a time. The URL hash (#about_me, ...) selects the
+ *   section, so sections can be bookmarked and back/forward works.
+ */
+(function () {
+    'use strict';
 
-// Also ensure active section is properly displayed
-const activeSection = document.querySelector('main > section.active');
-if (activeSection) {
-    activeSection.style.display = 'block';
-    activeSection.style.opacity = '1';
-}
+    const LANG = (document.documentElement.lang || 'en').toLowerCase().startsWith('es') ? 'es' : 'en';
 
-let navLinks = document.querySelectorAll('a.inner-link');
+    const STRINGS = {
+        en: {
+            roles: ['Cloud & MLOps Engineer', 'Machine Learning Engineer', 'AI Infrastructure Engineer'],
+            viewProject: 'View project',
+            showing: (n) => `Showing ${n} ${n === 1 ? 'project' : 'projects'}`,
+            sending: 'Sending your message…',
+            success: "Thanks! Your message was sent. I'll get back to you soon.",
+            missing: 'Please fill in every field before sending.',
+            rejected: "Your message couldn't be verified. Please check the fields and try again.",
+            failed: "Something went wrong and your message wasn't sent. Please try again in a moment.",
+            captcha: "The spam check didn't load, so the message can't be sent right now.",
+            timeout: 'The server took too long to respond. Please try again.',
+            fallback: 'You can also email me at',
+        },
+        es: {
+            roles: ['Ingeniero Cloud & MLOps', 'Ingeniero de Machine Learning', 'Ingeniero de Infraestructura de IA'],
+            viewProject: 'Ver proyecto',
+            showing: (n) => `Mostrando ${n} ${n === 1 ? 'proyecto' : 'proyectos'}`,
+            sending: 'Enviando tu mensaje…',
+            success: '¡Gracias! Tu mensaje se envió. Te responderé pronto.',
+            missing: 'Completa todos los campos antes de enviar.',
+            rejected: 'No se pudo verificar tu mensaje. Revisa los campos e inténtalo de nuevo.',
+            failed: 'Algo salió mal y tu mensaje no se envió. Inténtalo de nuevo en un momento.',
+            captcha: 'La verificación antispam no cargó, así que por ahora no se puede enviar el mensaje.',
+            timeout: 'El servidor tardó demasiado en responder. Inténtalo de nuevo.',
+            fallback: 'También puedes escribirme a',
+        },
+    }[LANG];
 
-navLinks.forEach((item) => {
-    item.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = item.getAttribute('href');
-        const targetSection = document.querySelector(`main > section${targetId}`);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-        if (!targetSection) return;
+    /* ------------------------------------------------------------------ *
+     * Section routing
+     * ------------------------------------------------------------------ */
+    const DEFAULT_SECTION = 'home';
+    const sections = Array.from(document.querySelectorAll('main > section[id]'));
+    const sectionIds = sections.map((section) => section.id);
+    const navLinks = Array.from(document.querySelectorAll('#sidebar nav a[href^="#"]'));
+    const langLinks = Array.from(document.querySelectorAll('[data-lang-link]'));
+    let currentId = null;
 
-        // 1. Update Navigation UI
-        const currentActiveLink = document.querySelector('nav ul li a.active');
-        if (currentActiveLink) currentActiveLink.classList.remove('active');
-        item.classList.add('active');
+    langLinks.forEach((link) => {
+        link.dataset.base = link.getAttribute('href');
+    });
 
-        // 2. Hide ALL sections and remove active class
-        document.querySelectorAll('main > section').forEach(section => {
-            section.classList.remove('active');
-            section.style.display = 'none';
+    function sectionFromHash(hash) {
+        let id = (hash || '').replace(/^#/, '');
+        try {
+            id = decodeURIComponent(id);
+        } catch (error) {
+            return null;
+        }
+        return sectionIds.includes(id) ? id : null;
+    }
+
+    function showSection(id, { moveFocus = false } = {}) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        currentId = id;
+
+        sections.forEach((section) => section.classList.toggle('active', section === target));
+
+        navLinks.forEach((link) => {
+            const isActive = link.getAttribute('href') === `#${id}`;
+            link.classList.toggle('active', isActive);
+            if (isActive) link.setAttribute('aria-current', 'page');
+            else link.removeAttribute('aria-current');
         });
 
-        // 3. Show target section
-        targetSection.classList.add('active');
-        targetSection.style.display = 'block';
-
-        // 4. Reset scroll to top
-        window.scrollTo({ top: 0, behavior: 'instant' });
-
-        // 5. Fix: Force Shuffle layout update when switching to Portfolio section
-        if (targetId === '#my_work' && typeof shuffleInstance !== 'undefined') {
-            // Wait for display:block to take effect so DOM can calculate sizes
-            requestAnimationFrame(() => {
-                setTimeout(() => {
-                    shuffleInstance.update();
-                    shuffleInstance.layout();
-                }, 50);
-            });
-        }
-    });
-});
-
-document.querySelector('#sidebar .toggle-sidebar').addEventListener('click', function () {
-    document.querySelector('#sidebar').classList.toggle('open');
-});
-
-var options = {
-    strings: ['Cloud & MLOps Engineer', 'Machine Learning Engineer', 'AI Infrastructure Engineer'],
-    contentType: null,
-    loop: true,
-    typeSpeed: 80,
-    backSpeed: 10
-};
-
-new Typed('.field h2', options);
-
-const shuffleInstance = new Shuffle(document.querySelector('#my_work .work-items'), {
-    itemSelector: '.item',
-});
-
-const filterButtons = document.querySelectorAll('#my_work .filters button');
-filterButtons.forEach((item) => {
-    item.addEventListener('click', workFilter);
-});
-
-function workFilter(event) {
-    const clickedButton = event.currentTarget;
-    const clickedButtonGroup = clickedButton.getAttribute('data-group');
-    const activeButton = document.querySelector('#my_work .filters button.active');
-
-    if (activeButton) activeButton.classList.remove('active');
-    clickedButton.classList.add("active");
-
-    shuffleInstance.filter(clickedButtonGroup);
-}
-
-var workModal = new bootstrap.Modal(document.getElementById('workModal'));
-const workElements = document.querySelectorAll("#my_work .work-items .wrap");
-
-function openWorkModal(item) {
-    const title = item.getAttribute('data-title');
-    const modalImage = document.querySelector('#workModal .modal-body img');
-
-    modalImage.setAttribute('src', item.getAttribute('data-image'));
-    modalImage.setAttribute('alt', title);
-    document.querySelector('#workModal .modal-body .title').innerText = title;
-    document.querySelector('#workModal .modal-body .description').innerText = item.getAttribute('data-description');
-    document.querySelector('#workModal .modal-body .type .value').innerText = item.getAttribute('data-type');
-    document.querySelector('#workModal .modal-body .completed .value').innerText = item.getAttribute('data-completed');
-    document.querySelector('#workModal .modal-body .skills .value').innerText = item.getAttribute('data-skills');
-    document.querySelector('#workModal .modal-body .project-link a').setAttribute('href', item.getAttribute('data-project-link'));
-
-    workModal.show();
-    // focus management: move focus to close button for accessibility
-    setTimeout(() => {
-        const closeBtn = document.querySelector("#workModal .modal-close-button");
-        if (closeBtn) closeBtn.focus();
-    }, 200);
-}
-
-workElements.forEach((item) => {
-    item.setAttribute('role', 'button');
-    item.setAttribute('tabindex', '0');
-    item.setAttribute('aria-label', `Open project details: ${item.getAttribute('data-title')}`);
-
-    item.addEventListener('click', function () {
-        openWorkModal(item);
-    });
-
-    item.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            openWorkModal(item);
-        }
-    });
-});
-
-var workModalElement = document.getElementById('workModal');
-workModalElement.addEventListener('show.bs.modal', function (event) {
-    document.getElementById('my_work').classList.add('blur');
-    document.getElementById('sidebar').classList.add('blur');
-    // trap focus inside modal
-    document.addEventListener('focus', trapFocus, true);
-});
-
-workModalElement.addEventListener('hide.bs.modal', function (event) {
-    document.getElementById('my_work').classList.remove('blur');
-    document.getElementById('sidebar').classList.remove('blur');
-    document.removeEventListener('focus', trapFocus, true);
-});
-
-let contactFromItems = document.querySelectorAll('#contact_me .form input, #contact_me .form textarea');
-
-contactFromItems.forEach((item) => {
-    item.addEventListener('focus', function () {
-        item.parentElement.classList.add('focus');
-    });
-
-    item.addEventListener('blur', function () {
-        if (!item.value) {
-            item.parentElement.classList.remove('focus');
-        }
-    });
-});
-
-function onSubmit(e) {
-    e.preventDefault();
-
-    grecaptcha.enterprise.ready(function () {
-        grecaptcha.enterprise.execute('6LdBoB8qAAAAAHqcXpmWKGEV2CrpMJGJrHjUv1PU', { action: 'submit' }).then(function (token) {
-            const data = {
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                subject: document.getElementById("subject").value,
-                message: document.getElementById("message").value,
-                'g-recaptcha-response': token
-            };
-
-            fetch("https://w8e7rbc1of.execute-api.us-east-1.amazonaws.com/prod/sendemail", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            })
-                .then(async response => {
-                    const responseData = await response.json().catch(() => ({}));
-                    if (!response.ok) {
-                        throw new Error(responseData.message || `Request failed with status ${response.status}`);
-                    }
-                    return responseData;
-                })
-                .then(data => {
-                    console.log("Response data:", data);
-                    document.querySelector('.form').innerHTML = `
-                        <div class="text-center form-success">
-                            <h3>Thank you for your message!</h3>
-                            <p>Your message has been sent successfully. A response will be provided shortly.</p>
-                        </div>
-                    `;
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    document.querySelector('.form').innerHTML = `
-                        <div class="text-center form-error">
-                            <h3>An error occurred!</h3>
-                            <p>${error.message || 'There was an issue sending your message. Please try again later.'}</p>
-                        </div>
-                    `;
-                });
+        // Keep the section when switching language
+        const suffix = id === DEFAULT_SECTION ? '' : `#${id}`;
+        langLinks.forEach((link) => {
+            link.setAttribute('href', link.dataset.base + suffix);
         });
+
+        window.scrollTo(0, 0);
+        if (moveFocus) target.focus({ preventScroll: true });
+        if (id === 'my_work') relayoutWork();
+    }
+
+    function navigate(id) {
+        if (!sectionIds.includes(id)) return;
+        if (id !== currentId) {
+            const url = id === DEFAULT_SECTION ? location.pathname + location.search : `#${id}`;
+            history.pushState({ section: id }, '', url);
+        }
+        showSection(id, { moveFocus: true });
+    }
+
+    // Any same-page link to a section (nav, logo, "View projects", "Message me", ...)
+    document.addEventListener('click', (event) => {
+        if (event.defaultPrevented || event.button !== 0) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const link = event.target.closest('a[href^="#"]');
+        if (!link) return;
+        const id = sectionFromHash(link.getAttribute('href'));
+        if (!id) return; // e.g. the skip link (#main) keeps its default behavior
+        event.preventDefault();
+        navigate(id);
     });
-}
 
-function trapFocus(e) {
-    const modal = document.getElementById('workModal');
-    if (!modal) return;
-    if (modal.contains(e.target)) return;
-    const focusable = modal.querySelectorAll('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
-    if (focusable.length) { focusable[0].focus(); e.preventDefault(); }
-}
+    window.addEventListener('popstate', () => {
+        const id = sectionFromHash(location.hash) || (location.hash ? null : DEFAULT_SECTION);
+        if (id && id !== currentId) showSection(id);
+    });
 
-// Scroll-to-top button functionality
-const scrollTopBtn = document.getElementById('scrollTop');
-if (scrollTopBtn) {
-    // Check scroll position - works for both window scroll and section scroll
-    function checkScrollPosition() {
-        const scrollY = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
-        if (scrollY > 300) {
-            scrollTopBtn.classList.add('visible');
-        } else {
-            scrollTopBtn.classList.remove('visible');
+    /* ------------------------------------------------------------------ *
+     * Hero role animation (skipped when the user prefers reduced motion)
+     * ------------------------------------------------------------------ */
+    const typedTarget = document.querySelector('#home .typed');
+    if (typedTarget && typeof window.Typed === 'function' && !reduceMotion.matches) {
+        // The markup holds the first role as a fallback (no JS / reduced motion). Typed.js
+        // treats existing text as an already-typed extra string, which would make the first
+        // role appear all at once, so clear it before starting.
+        typedTarget.textContent = '';
+        // eslint-disable-next-line no-new
+        new window.Typed(typedTarget, {
+            strings: STRINGS.roles,
+            contentType: null,
+            loop: true,
+            typeSpeed: 70,
+            backSpeed: 30,
+            backDelay: 1800,
+            startDelay: 300,
+        });
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Portfolio filters (Shuffle.js, with a plain fallback if the CDN fails)
+     * ------------------------------------------------------------------ */
+    const grid = document.querySelector('#my_work .work-items');
+    const workItems = grid ? Array.from(grid.querySelectorAll('.item')) : [];
+    const filterButtons = Array.from(document.querySelectorAll('#my_work .filters button[data-group]'));
+    const filterStatus = document.querySelector('#my_work .filter-status');
+    let shuffle = null;
+
+    if (grid && typeof window.Shuffle === 'function') {
+        shuffle = new window.Shuffle(grid, {
+            itemSelector: '.item',
+            speed: reduceMotion.matches ? 0 : 300,
+        });
+    }
+
+    // Give every card the height of the tallest one, but only when cards sit side by
+    // side. In a single column, equal heights would just add empty space.
+    function equalizeCards() {
+        const cards = workItems.map((item) => item.querySelector('.wrap')).filter(Boolean);
+        cards.forEach((card) => { card.style.minHeight = ''; });
+        if (!grid || cards.length < 2) return;
+        const columns = Math.round(grid.clientWidth / Math.max(1, workItems[0].getBoundingClientRect().width));
+        if (columns < 2) return;
+        const tallest = Math.max(...cards.map((card) => card.getBoundingClientRect().height));
+        cards.forEach((card) => { card.style.minHeight = `${Math.ceil(tallest)}px`; });
+    }
+
+    function relayoutWork() {
+        if (!grid) return;
+        // Wait for the section to be displayed so the items can be measured
+        requestAnimationFrame(() => {
+            equalizeCards();
+            if (shuffle) {
+                shuffle.update();
+                shuffle.layout();
+            }
+        });
+    }
+
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (currentId === 'my_work') relayoutWork();
+        }, 150);
+    });
+
+    function itemGroups(item) {
+        try {
+            return JSON.parse(item.dataset.groups || '[]');
+        } catch (error) {
+            return [];
         }
     }
 
-    // Listen to scroll on window
-    window.addEventListener('scroll', checkScrollPosition);
-    // Also listen to scroll on document for broader compatibility
-    document.addEventListener('scroll', checkScrollPosition);
+    filterButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const group = button.dataset.group;
+            filterButtons.forEach((other) => other.setAttribute('aria-pressed', String(other === button)));
 
-    scrollTopBtn.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
+            let visible;
+            if (shuffle) {
+                shuffle.filter(group === 'all' ? window.Shuffle.ALL_ITEMS : group);
+                visible = shuffle.visibleItems;
+            } else {
+                visible = 0;
+                workItems.forEach((item) => {
+                    const show = group === 'all' || itemGroups(item).includes(group);
+                    item.hidden = !show;
+                    if (show) visible += 1;
+                });
+            }
+            if (filterStatus) filterStatus.textContent = STRINGS.showing(visible);
+        });
     });
-}
+
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayoutWork);
+    window.addEventListener('load', relayoutWork);
+
+    /* ------------------------------------------------------------------ *
+     * Project modal (Bootstrap handles the focus trap and Escape)
+     * ------------------------------------------------------------------ */
+    const modalEl = document.getElementById('workModal');
+    const modal = modalEl && window.bootstrap ? window.bootstrap.Modal.getOrCreateInstance(modalEl) : null;
+    let lastTrigger = null;
+
+    function openProject(card, trigger) {
+        if (!modal) return;
+        const data = card.dataset;
+        const image = modalEl.querySelector('.modal-media img');
+        image.src = data.image || '';
+        image.alt = '';
+        // Optional focal point for the wide popup header, e.g. data-image-position="center 42%"
+        image.style.objectPosition = data.imagePosition || '';
+
+        modalEl.querySelector('.modal-type').textContent = data.type || '';
+        modalEl.querySelector('.modal-project-title').textContent = data.title || '';
+        modalEl.querySelector('.description').textContent = data.description || '';
+        modalEl.querySelector('.type-value').textContent = data.type || '';
+        modalEl.querySelector('.completed-value').textContent = data.completed || '';
+
+        const tools = modalEl.querySelector('.tools-value');
+        const chips = (data.skills || '')
+            .split(',')
+            .map((skill) => skill.trim())
+            .filter(Boolean)
+            .map((skill) => {
+                const chip = document.createElement('li');
+                chip.className = 'chip';
+                chip.textContent = skill;
+                return chip;
+            });
+        tools.replaceChildren(...chips);
+
+        const link = modalEl.querySelector('.project-link');
+        const href = (data.projectLink || '').trim();
+        if (href && href !== '#') {
+            link.href = href;
+            link.querySelector('.label').textContent = data.linkLabel || STRINGS.viewProject;
+            link.hidden = false;
+        } else {
+            link.removeAttribute('href');
+            link.hidden = true;
+        }
+
+        lastTrigger = trigger;
+        modal.show();
+    }
+
+    document.querySelectorAll('#my_work .wrap').forEach((card) => {
+        const trigger = card.querySelector('.card-open');
+        if (!trigger) return;
+        trigger.setAttribute('aria-haspopup', 'dialog');
+        trigger.addEventListener('click', () => openProject(card, trigger));
+    });
+
+    if (modalEl) {
+        modalEl.addEventListener('shown.bs.modal', () => {
+            const closeButton = modalEl.querySelector('.modal-close-button');
+            if (closeButton) closeButton.focus();
+        });
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            if (lastTrigger) lastTrigger.focus();
+            lastTrigger = null;
+        });
+        // Bootstrap keeps focus out of the page behind the dialog. This also wraps
+        // Tab / Shift+Tab around the dialog's own controls instead of leaving the document.
+        modalEl.addEventListener('keydown', (event) => {
+            if (event.key !== 'Tab') return;
+            const focusable = Array.from(modalEl.querySelectorAll('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'))
+                .filter((el) => !el.hidden && !el.disabled && el.offsetParent !== null);
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        });
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Contact form
+     * ------------------------------------------------------------------ */
+    const form = document.getElementById('contactForm');
+    const FIELDS = ['name', 'email', 'subject', 'message'];
+
+    function fail(code) {
+        const error = new Error(code);
+        error.code = code;
+        return error;
+    }
+
+    function waitFor(check, timeoutMs) {
+        return new Promise((resolve, reject) => {
+            const started = Date.now();
+            (function poll() {
+                const value = check();
+                if (value) resolve(value);
+                else if (Date.now() - started > timeoutMs) reject(fail('captcha'));
+                else setTimeout(poll, 200);
+            })();
+        });
+    }
+
+    async function getRecaptchaToken(siteKey) {
+        if (!siteKey) throw fail('captcha');
+        const api = await waitFor(() => window.grecaptcha && window.grecaptcha.enterprise, 5000);
+        return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => reject(fail('captcha')), 10000);
+            api.ready(() => {
+                api.execute(siteKey, { action: 'submit' }).then(
+                    (token) => {
+                        clearTimeout(timer);
+                        resolve(token);
+                    },
+                    () => {
+                        clearTimeout(timer);
+                        reject(fail('captcha'));
+                    }
+                );
+            });
+        });
+    }
+
+    async function postJson(url, payload, timeoutMs) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            return await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                signal: controller.signal,
+            });
+        } catch (error) {
+            throw fail(error && error.name === 'AbortError' ? 'timeout' : 'failed');
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    if (form) {
+        const status = form.querySelector('.form-status');
+        const submitButton = form.querySelector('button[type="submit"]');
+        const endpoint = form.getAttribute('action');
+        const siteKey = form.dataset.recaptchaKey;
+        const mailLink = document.querySelector('#contact_me a[href^="mailto:"]');
+        let sending = false;
+
+        const setStatus = (kind, message, withFallback = false) => {
+            status.className = `form-status is-${kind}`;
+            status.replaceChildren(document.createTextNode(message));
+            if (withFallback && mailLink) {
+                const link = document.createElement('a');
+                link.href = mailLink.getAttribute('href');
+                link.textContent = mailLink.getAttribute('href').replace(/^mailto:/, '');
+                status.append(` ${STRINGS.fallback} `, link, '.');
+            }
+        };
+
+        const setBusy = (busy) => {
+            sending = busy;
+            submitButton.disabled = busy;
+            submitButton.classList.toggle('is-loading', busy);
+            form.setAttribute('aria-busy', String(busy));
+        };
+
+        // The submit event only fires after the browser's built-in validation passes
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (sending) return;
+
+            const values = {};
+            FIELDS.forEach((name) => {
+                values[name] = (form.elements[name].value || '').trim();
+            });
+
+            // `required` accepts whitespace-only input; the Lambda doesn't
+            const firstEmpty = FIELDS.find((name) => !values[name]);
+            if (firstEmpty) {
+                setStatus('error', STRINGS.missing);
+                form.elements[firstEmpty].focus();
+                return;
+            }
+
+            setBusy(true);
+            setStatus('info', STRINGS.sending);
+
+            try {
+                const token = await getRecaptchaToken(siteKey);
+                const response = await postJson(endpoint, { ...values, 'g-recaptcha-response': token }, 15000);
+                if (!response.ok) throw fail(response.status >= 400 && response.status < 500 ? 'rejected' : 'failed');
+                form.reset();
+                setStatus('success', STRINGS.success);
+            } catch (error) {
+                const code = error && STRINGS[error.code] ? error.code : 'failed';
+                setStatus('error', STRINGS[code], true);
+            } finally {
+                setBusy(false);
+            }
+        });
+    }
+
+    /* ------------------------------------------------------------------ *
+     * Back-to-top button and footer year
+     * ------------------------------------------------------------------ */
+    const scrollTopButton = document.getElementById('scrollTop');
+    if (scrollTopButton) {
+        let ticking = false;
+        const update = () => {
+            scrollTopButton.classList.toggle('visible', window.scrollY > 400);
+            ticking = false;
+        };
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(update);
+            }
+        }, { passive: true });
+        scrollTopButton.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+            // The button hides at the top, so move focus somewhere sensible
+            const section = currentId && document.getElementById(currentId);
+            if (section) section.focus({ preventScroll: true });
+        });
+        update();
+    }
+
+    document.querySelectorAll('[data-year]').forEach((element) => {
+        element.textContent = String(new Date().getFullYear());
+    });
+
+    /* ------------------------------------------------------------------ *
+     * Initial section from the URL
+     * ------------------------------------------------------------------ */
+    showSection(sectionFromHash(location.hash) || DEFAULT_SECTION);
+})();

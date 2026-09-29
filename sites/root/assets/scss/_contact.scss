@@ -1,109 +1,183 @@
+@use "colors" as *;
+@use "fonts" as *;
+@use "mixins" as *;
+
 #contact_me {
-    background: $dark_bg;
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-
-    .form {
-        background: rgba($secondary, 0.05);
-        border: 1px solid rgba($gray, 0.06);
+    .contact-card {
+        @include surface(24px);
+        position: relative;
+        overflow: hidden;
         padding: 2rem;
-        border-radius: 16px;
 
-        .form-item {
-            margin-bottom: 1.5rem;
+        // Brand line on top
+        &::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            height: 2px;
+            background: $gradient_brand;
+            opacity: 0.85;
+        }
+    }
 
-            label {
-                display: block;
-                font-weight: 500;
-                font-size: 0.95rem;
-                margin-bottom: 0.75rem;
-                color: $text_main;
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.1rem;
+
+        .full {
+            grid-column: 1 / -1;
+        }
+    }
+
+    .form-item {
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: $text_main;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            border: 1px solid $border_strong;
+            background: rgba($dark_bg, 0.55);
+            color: $text_main;
+            font-family: $font_main;
+            font-size: 1rem; // 16px avoids zoom-on-focus in iOS Safari
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+            &::placeholder {
+                color: rgba($gray, 0.75);
             }
 
-            input,
-            textarea {
-                width: 100%;
-                padding: 14px 16px;
-                border-radius: 12px;
-                border: 1px solid rgba($gray, 0.3);
-                background: rgba(255, 255, 255, 0.04);
-                color: $text_main;
-                font-family: $font_main;
-                transition: all 0.3s ease;
-
-                &:focus {
-                    outline: none;
-                    border-color: $primary;
-                    background: rgba(255, 255, 255, 0.07);
-                    box-shadow: 0 0 0 4px rgba($primary, 0.1);
-                }
+            &:hover {
+                border-color: rgba($gray, 0.45);
             }
 
-            textarea {
-                min-height: 140px;
-                resize: vertical;
+            &:focus {
+                outline: none;
+                border-color: $primary;
+                background: rgba($dark_bg, 0.8);
+                box-shadow: 0 0 0 4px rgba($primary, 0.18);
+            }
+
+            // Only after the user has interacted with the field
+            &:user-invalid {
+                border-color: $danger;
+                box-shadow: 0 0 0 4px rgba($danger, 0.12);
             }
         }
 
-        .form-success,
-        .form-error {
-            padding: 2rem;
-            border-radius: 12px;
-            background: rgba($primary, 0.05);
-            border: 1px solid rgba($primary, 0.06);
+        textarea {
+            min-height: 160px;
+            resize: vertical;
+        }
+    }
+
+    .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .recaptcha-note {
+        max-width: 26rem;
+        font-size: 0.78rem;
+        line-height: 1.55;
+
+        a {
             color: $text_main;
         }
     }
 
-    .info {
-        padding-left: 3rem;
+    // Live region. Kept in the layout (just empty) so screen readers announce updates.
+    .form-status {
+        margin-top: 1.25rem;
+        padding: 0.9rem 1rem;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        color: $text_main;
+        font-size: 0.95rem;
+
+        &:empty {
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        &.is-info {
+            border-color: rgba($accent_blue, 0.35);
+            background: rgba($accent_blue, 0.1);
+        }
+
+        &.is-success {
+            border-color: rgba($primary, 0.4);
+            background: rgba($primary, 0.1);
+        }
+
+        &.is-error {
+            border-color: rgba($danger, 0.45);
+            background: rgba($danger, 0.1);
+        }
+
+        a {
+            color: $text_main;
+            font-weight: 600;
+        }
+    }
+
+    .contact-info {
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        gap: 2rem;
+        gap: 1rem;
+    }
 
-        .item {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.1rem 1.25rem;
+        border-radius: 18px;
+        border: 1px solid $border;
+        background: rgba($secondary, 0.15);
+        color: inherit;
+        text-decoration: none;
+        transition: border-color 0.2s ease, transform 0.2s ease;
 
-            i {
-                color: $primary;
-                font-size: 1.5rem;
-                width: 50px;
-                height: 50px;
-                background: rgba($primary, 0.1);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 12px;
-            }
+        .icon {
+            @include icon-tile(46px);
+            font-size: 1.35rem;
+        }
 
-            .text {
-                .title {
-                    display: block;
-                    font-size: 0.85rem;
-                    color: $text_muted;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    margin-bottom: 4px;
-                }
+        .label {
+            @include label-caps;
+            display: block;
+            margin-bottom: 0.15rem;
+        }
 
-                p,
-                a {
-                    margin: 0;
-                    font-size: 1.1rem;
-                    font-weight: 500;
-                    color: $text_main;
-                    text-decoration: none;
-                    transition: color 0.2s ease;
-                }
+        .value {
+            display: block;
+            color: $text_main;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+            transition: color 0.2s ease;
+        }
+    }
 
-                a:hover {
-                    color: $primary;
-                }
-            }
+    a.info-item:hover {
+        border-color: rgba($primary, 0.45);
+        transform: translateY(-2px);
+
+        .value {
+            color: $primary;
         }
     }
 }
