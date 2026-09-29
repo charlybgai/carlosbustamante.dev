@@ -85,14 +85,7 @@ resource "aws_lambda_function" "send_email" {
   }
 }
 
-# The function's log group already exists (Lambda created it on first run), so it's adopted
-# with an import block instead of being recreated. The import block is a no-op after the first
-# apply and can be deleted then.
-import {
-  to = aws_cloudwatch_log_group.send_email
-  id = "/aws/lambda/SendEmailFunction"
-}
-
+# Adopted from the log group Lambda created on first run (imported on 2026-09-29).
 resource "aws_cloudwatch_log_group" "send_email" {
   name              = "/aws/lambda/${aws_lambda_function.send_email.function_name}"
   retention_in_days = 90
