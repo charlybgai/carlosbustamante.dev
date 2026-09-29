@@ -3,7 +3,8 @@
 Static bilingual (EN/ES) portfolio for Carlos Bustamante at https://carlosbustamante.dev.
 Plain HTML + SCSS + vanilla JS on S3/CloudFront. The contact form is a Python Lambda
 behind API Gateway, with Google reCAPTCHA Enterprise. All infrastructure is in Terraform.
-There's no framework, no bundler, no package.json, and no test suite.
+There's no framework, no bundler and no package.json. The only automated tests are the Lambda's
+unit tests.
 
 ## Layout
 
@@ -11,6 +12,7 @@ There's no framework, no bundler, no package.json, and no test suite.
 sites/root/                 # Deployed as-is to S3 (the site root)
   index.html                # English page (all sections in one file)
   es/index.html             # Spanish page (mirror of index.html)
+  404.html                  # Bilingual not-found page (CloudFront serves it for any missing path)
   assets/js/script.js       # Shared JS for both pages. UI strings are in its STRINGS table
   assets/scss/              # SCSS source: main.scss @use's the partials _*.scss
   assets/css/main.css       # Compiled CSS (committed; this is what the browser loads)
@@ -21,6 +23,7 @@ sites/root/                 # Deployed as-is to S3 (the site root)
   googlee0a7ad9869d1b1e8.html   # Google Search Console verification. Don't delete it.
 functions/send_email/
   lambda_function.py        # Contact form handler (python3.12, stdlib + boto3 only)
+  test_lambda_function.py   # Unit tests (stdlib only; boto3 and network are faked)
 infra/                      # Terraform: AWS (us-east-1) + Google provider
   s3.tf  cloudfront.tf  route53.tf  contact.tf  recaptcha.tf
   backend.tf                # Remote state: s3://carlosbustamante-ops-terraform-state
@@ -34,6 +37,10 @@ cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared st
 - Browser → CloudFront → private S3 bucket through OAC. A CloudFront Function rewrites
   `/path/` and `/path` to `/path/index.html`, which is how `/es/` resolves.
 - `www.` → S3 website redirect bucket → 301 to the apex domain.
+- CloudFront uses the managed `CachingOptimized` cache policy (Gzip/Brotli, query strings are
+  not part of the cache key, default TTL 1 day). `deploy.sh` invalidates `/*`, so a deploy is
+  always visible. Missing paths (S3 returns 403 or 404) get `/404.html` with status 404. Every URL
+  in `404.html` must be root-absolute, because it's served at the missing path.
 - Contact form: the `submit` handler in `script.js` runs after native HTML validation, gets a
   reCAPTCHA Enterprise token (action `submit`), and POSTs JSON to API Gateway
   `/prod/sendemail`. The Lambda verifies the token with Google (min score 0.5) and sends the
@@ -85,14 +92,17 @@ cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared st
    ```
    Commit the SCSS and the regenerated CSS/map together.
 3. **Bump the cache-busters** (`main.css?v=YYYYMMDD-tag`, `script.js?v=YYYYMMDD-tag`) in both
-   HTML files when you change CSS or JS.
+   HTML files when you change CSS or JS. `404.html` links `main.css` too.
 4. When page content changes, update `<lastmod>` in `sitemap.xml`. When metadata changes,
    update the JSON-LD block and `<meta>` tags in both HTML files.
 5. Career facts (roles, dates, certifications) must match the CV PDFs. Don't invent metrics.
 6. The Lambda has no dependencies. Terraform `archive_file` zips just the one `.py` file.
    Adding a third-party package would mean changing the packaging in `contact.tf`.
-7. `aws_api_gateway_deployment` has no `triggers`. If you change API methods or
-   integrations, a new deployment may not be created, so verify the `prod` stage.
+   Field length limits in the Lambda (`MAX_LENGTHS`) match the form's `maxlength` attributes;
+   change both together.
+7. `aws_api_gateway_deployment` redeploys through `triggers`, a hash of the API resources.
+   If you add an API resource, method or integration, add it to that list too. The `prod` stage
+   is throttled (2 req/s, burst 5) via `aws_api_gateway_method_settings`.
 
 ## CV (resume PDFs)
 
@@ -115,6 +125,7 @@ cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared st
 terraform -chdir=infra fmt -check -recursive
 terraform -chdir=infra validate
 python3 -m py_compile functions/send_email/lambda_function.py
+python3 -m unittest discover -s functions/send_email
 node --check sites/root/assets/js/script.js
 python3 -m http.server 8000 --directory sites/root   # preview at http://localhost:8000 and /es/
 ```
