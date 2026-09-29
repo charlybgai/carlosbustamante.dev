@@ -26,9 +26,41 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "ses_full_access" {
-  role       = aws_iam_role.send_email.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+data "aws_caller_identity" "current" {}
+
+locals {
+  # SES checks SendEmail against the verified identity of the sender. In the SES sandbox the
+  # recipient must be a verified identity as well, so both addresses' domains are allowed.
+  ses_identity_arns = distinct([
+    for address in [var.contact_sender_email, var.contact_recipient_email] :
+    "arn:aws:ses:us-east-1:${data.aws_caller_identity.current.account_id}:identity/${split("@", address)[1]}"
+  ])
+}
+
+# Least privilege: the function can only send from the contact sender, to the contact recipient.
+resource "aws_iam_role_policy" "send_email_ses" {
+  name = "SendContactEmail"
+  role = aws_iam_role.send_email.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "SendContactFormEmail"
+        Effect   = "Allow"
+        Action   = "ses:SendEmail"
+        Resource = local.ses_identity_arns
+        Condition = {
+          StringEquals = {
+            "ses:FromAddress" = var.contact_sender_email
+          }
+          "ForAllValues:StringEquals" = {
+            "ses:Recipients" = [var.contact_recipient_email]
+          }
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_lambda_function" "send_email" {
@@ -51,6 +83,12 @@ resource "aws_lambda_function" "send_email" {
       RECAPTCHA_SITE_KEY = google_recaptcha_enterprise_key.portfolio_contact_form.name
     }
   }
+}
+
+# Adopted from the log group Lambda created on first run (imported on 2026-09-29).
+resource "aws_cloudwatch_log_group" "send_email" {
+  name              = "/aws/lambda/${aws_lambda_function.send_email.function_name}"
+  retention_in_days = 90
 }
 
 resource "aws_api_gateway_rest_api" "send_email" {
@@ -137,20 +175,48 @@ resource "aws_api_gateway_integration_response" "sendemail_options" {
   ]
 }
 
+# A deployment is a snapshot of the API. `triggers` hashes every resource that defines the API,
+# so any change to them creates a new deployment and the prod stage picks it up.
+# create_before_destroy lets the stage move to the new deployment before the old one is deleted.
 resource "aws_api_gateway_deployment" "send_email" {
   rest_api_id = aws_api_gateway_rest_api.send_email.id
-  description = "Fix both root and sendemail OPTIONS CORS"
+  description = "Managed by Terraform"
 
-  depends_on = [
-    aws_api_gateway_integration.sendemail_post,
-    aws_api_gateway_integration_response.sendemail_options
-  ]
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.sendemail,
+      aws_api_gateway_method.sendemail_post,
+      aws_api_gateway_integration.sendemail_post,
+      aws_api_gateway_method.sendemail_options,
+      aws_api_gateway_method_response.sendemail_options,
+      aws_api_gateway_integration.sendemail_options,
+      aws_api_gateway_integration_response.sendemail_options,
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_api_gateway_stage" "prod" {
   rest_api_id   = aws_api_gateway_rest_api.send_email.id
   deployment_id = aws_api_gateway_deployment.send_email.id
   stage_name    = "prod"
+}
+
+# Throttle every method on the stage (the account default is 10,000 requests/s). Each form
+# submission is two requests (the CORS preflight and the POST), and SES in this account sends
+# at most 1 email/s, so this is plenty for real visitors and caps abuse of Lambda/reCAPTCHA.
+resource "aws_api_gateway_method_settings" "prod" {
+  rest_api_id = aws_api_gateway_rest_api.send_email.id
+  stage_name  = aws_api_gateway_stage.prod.stage_name
+  method_path = "*/*"
+
+  settings {
+    throttling_rate_limit  = 2
+    throttling_burst_limit = 5
+  }
 }
 
 resource "aws_lambda_permission" "api_gateway" {

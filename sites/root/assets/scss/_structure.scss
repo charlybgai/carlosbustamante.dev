@@ -1,68 +1,235 @@
+@use "colors" as *;
+@use "fonts" as *;
+@use "mixins" as *;
+
+// Keyboard focus ring used everywhere (inputs override it with their own glow)
+:focus-visible {
+    outline: 2px solid $primary;
+    outline-offset: 3px;
+}
+
+.skip-link {
+    position: fixed;
+    top: -100px;
+    left: 1rem;
+    z-index: 2000;
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    background: $primary;
+    color: $on_primary;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.2s ease;
+
+    &:focus {
+        top: 1rem;
+        color: $on_primary;
+    }
+}
+
 main {
-    padding-left: 80px;
-    width: 100%;
-    min-height: 100dvh; // Use dynamic viewport height
-    background: $dark_bg;
+    position: relative;
+    min-height: 100dvh;
+    padding-left: $rail_width;
+
+    &:focus {
+        outline: none;
+    }
 
     > section {
-        display: none;
-        width: 100%;
-        min-height: 100dvh; // Use dynamic viewport height
-        padding: 80px 40px;
         position: relative;
-        opacity: 0;
-        transition: opacity 0.4s ease;
+        width: 100%;
+        min-height: 100dvh;
+        padding: 96px 48px 88px;
 
-        &.active {
-            display: block;
-            opacity: 1;
+        &:focus {
+            outline: none;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: $container_max;
             margin: 0 auto;
         }
+    }
+}
 
-        &:not(#home) {
-            padding-top: 64px;
+// With JS, only the active section is shown (see script.js). Without JS every
+// section stays visible and the nav links scroll to them. `!important` because
+// some sections set `display` with an ID selector (e.g. #home is flex).
+.js main > section:not(.active) {
+    display: none !important;
+}
+
+.js main > section.active {
+    animation: section-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes section-in {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+// Section header: mono eyebrow + big title + optional lead
+.section-head {
+    max-width: 720px;
+    margin-bottom: 3rem;
+
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        margin-bottom: 1rem;
+        font-family: $font_mono;
+        font-size: 0.85rem;
+        letter-spacing: 0.04em;
+        color: $primary;
+
+        &::before {
+            content: "";
+            width: 28px;
+            height: 2px;
+            border-radius: 2px;
+            background: $gradient_brand;
         }
+    }
 
-        &.active {
-            display: block;
+    h2 {
+        font-size: clamp(2.1rem, 1.5rem + 2.2vw, 3.25rem);
+    }
+
+    .section-lead {
+        margin-top: 1rem;
+        font-size: 1.1rem;
+    }
+}
+
+// Sub-section heading with an icon tile
+.sub-head {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+
+    i {
+        @include icon-tile(38px);
+        font-size: 1.2rem;
+    }
+}
+
+// Pills/chips
+.chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid $border;
+    background: rgba($secondary, 0.35);
+    color: $light_gray;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.3;
+    white-space: nowrap;
+
+    &.chip--accent {
+        color: $primary;
+        background: rgba($primary, 0.1);
+        border-color: rgba($primary, 0.28);
+    }
+}
+
+// Footer
+.site-footer {
+    margin-left: $rail_width;
+    padding: 1.75rem 48px;
+    border-top: 1px solid $border;
+    font-size: 0.85rem;
+
+    .inner {
+        max-width: $container_max;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.5rem 1.5rem;
+    }
+
+    p {
+        color: $text_muted;
+        line-height: 1.6;
+    }
+
+    a {
+        color: $text_main;
+        text-decoration: underline;
+        text-decoration-color: rgba($primary, 0.6);
+
+        &:hover {
+            color: $primary;
         }
+    }
+}
 
-        header.has-bg {
-            position: relative;
-            display: inline-flex;
-            margin-bottom: 2rem;
+// Back-to-top button
+.scroll-top {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 999;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba($primary, 0.4);
+    background: rgba($surface, 0.85);
+    backdrop-filter: blur(8px);
+    color: $primary;
+    font-size: 1.25rem;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease, background-color 0.2s ease, color 0.2s ease;
 
-            img {
-                display: none; // Removed old background images for cleaner look
-            }
-        }
+    &.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+    }
 
-        header.custom {
-            position: relative;
-            text-align: center;
-            margin-bottom: 42px;
+    &:hover {
+        background: $primary;
+        color: $on_primary;
+    }
+}
 
-            &:before {
-                content: "";
-                position: absolute;
-                width: 100%;
-                height: 2px;
-                background: $secondary;
-                left: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: -1;
-            }
+// The reCAPTCHA badge is hidden because the required attribution text is shown
+// next to the contact form (allowed by Google's reCAPTCHA FAQ). Don't use display:none.
+.grecaptcha-badge {
+    visibility: hidden;
+}
 
-            h2 {
-                display: inline-block;
-                padding: 0 24px;
-                background: $dark_bg;
-            }
-        }
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

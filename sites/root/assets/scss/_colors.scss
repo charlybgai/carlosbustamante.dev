@@ -1,3 +1,6 @@
+@use "sass:color";
+
+// Base palette
 $dark_bg: #0F172A; // Deep blue/black
 $secondary: #334155; // Slate gray
 $primary: #10B981; // Vibrant Emerald (Matches ML/Data vibe)
@@ -6,3 +9,13 @@ $gray: #94A3B8; // Muted slate
 $light_gray: #F1F5F9; // Soft background highlights
 $text_main: #F8FAFC;
 $text_muted: #94A3B8;
+$danger: #F87171; // Soft red, only for form errors
+
+// Derived tokens. Build new shades from the palette above instead of adding hex values.
+$surface: color.adjust($dark_bg, $lightness: 3%);
+$surface_raised: color.adjust($dark_bg, $lightness: 6%);
+$border: rgba($gray, 0.14);
+$border_strong: rgba($gray, 0.28);
+$accent_blue_text: color.adjust($accent_blue, $lightness: 12%); // Readable blue text on dark surfaces
+$on_primary: $dark_bg; // Text on emerald/brand gradient (about 7:1; white is only 2.5:1)
+$gradient_brand: linear-gradient(135deg, $primary 0%, $accent_blue 100%);

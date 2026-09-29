@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CloudFront returns this page (status 404) for any missing path, e.g. /es/old/page,
+         so every URL below is root-absolute. -->
+    <title>Page not found · Página no encontrada | Carlos Bustamante</title>
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#0F172A">
+    <link rel="icon" href="/assets/images/favicon.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800&display=swap">
+    <link rel="stylesheet" href="/assets/css/main.css?v=20260929-highlights">
+    <style>
+        main.not-found {
+            display: grid;
+            place-items: center;
+            padding: 48px 20px;
+        }
+
+        .not-found .card {
+            width: min(560px, 100%);
+            padding: 2.5rem 2rem;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(22, 32, 54, 0.72), rgba(18, 27, 47, 0.72));
+            text-align: center;
+        }
+
+        .not-found .code {
+            margin-bottom: 1.25rem;
+            font-family: 'Fira Code', ui-monospace, monospace;
+            font-size: 1rem;
+            letter-spacing: 0.1em;
+            color: #10B981;
+        }
+
+        .not-found h1,
+        .not-found h2 {
+            margin-bottom: 0.6rem;
+            font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem);
+        }
+
+        .not-found p {
+            margin-bottom: 1.5rem;
+        }
+
+        .not-found hr {
+            margin: 2rem 0;
+            border: 0;
+            border-top: 1px solid rgba(148, 163, 184, 0.14);
+        }
+    </style>
+</head>
+
+<body>
+    <main id="main" class="not-found">
+        <div class="card">
+            <p class="code">Error 404</p>
+
+            <section lang="en" aria-labelledby="not-found-en">
+                <h1 id="not-found-en">Page not found</h1>
+                <p>The page you're looking for doesn't exist or has moved.</p>
+                <a class="btn-custom-blue" href="/">Go to the home page</a>
+            </section>
+
+            <hr>
+
+            <section lang="es" aria-labelledby="not-found-es">
+                <h2 id="not-found-es">Página no encontrada</h2>
+                <p>La página que buscas no existe o cambió de dirección.</p>
+                <a class="btn-custom-dark" href="/es/">Ir a la página de inicio</a>
+            </section>
+        </div>
+    </main>
+</body>
+
+</html>

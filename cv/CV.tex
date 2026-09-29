@@ -1,0 +1,97 @@
+\documentclass[10pt,letterpaper]{article}
+% English CV. Build with: ./cv/build.sh  (layout lives in style.tex)
+\input{style}
+
+\begin{document}
+
+% ---------- Header ----------
+\begin{center}
+    {\LARGE \textbf{Carlos Alberto Bustamante Gaytán}} \\[-1pt]
+    Cloud \& MLOps Engineer | AWS | Kubernetes | Terraform | AI Infrastructure \\[2pt]
+    Estado de México, Mexico |
+    \href{mailto:me@carlosbustamante.dev}{me@carlosbustamante.dev} |
+    +52 55 3131 1250 \\
+    \href{https://carlosbustamante.dev}{carlosbustamante.dev} |
+    \href{https://github.com/charlybgai}{github.com/charlybgai} |
+    \href{https://linkedin.com/in/charlybgai}{linkedin.com/in/charlybgai}
+\end{center}
+
+% ---------- Summary ----------
+\section*{Professional Summary}
+Cloud and MLOps Engineer with experience designing and deploying production AI systems on AWS and Kubernetes. Strong background in Terraform, containerized deployments, Python, model serving, LLM infrastructure, and scalable backend systems. Focused on building reliable cloud platforms for AI automation, agentic workflows, and production-grade machine learning workloads.
+
+% ---------- Experience ----------
+\section*{Professional Experience}
+
+\entry
+{GlobalLogic (client: Ring, an Amazon company)}{June 2026 -- Present}
+{Senior Software Engineer}{Remote}
+\begin{itemize}
+  \item Building AI agents that accelerate internal product and engineering workflows at Ring for PMs, TPMs, and engineers.
+\end{itemize}
+
+\entry
+{Corteza.ai}{January 2026 -- May 2026}
+{Senior Machine Learning Engineer}{Remote}
+\begin{itemize}
+  \item Architected production AI infrastructure on AWS using Terraform and Kubernetes, supporting ML and LLM workloads across EKS, ECR, EC2, S3, EFS, and Route 53.
+  \item Built Terraform-managed AMIs that cut Kubernetes pod startup time from $\sim$5 to 2 minutes by minimizing container image pulls.
+  \item Migrated a production assistant from RabbitMQ-based processing to streaming inference with vLLM, increasing concurrent responses from 2 to 10 on a single GPU instance.
+\end{itemize}
+
+\entry
+{Corteza.ai}{September 2024 -- January 2026}
+{Machine Learning Engineer}{Remote}
+\begin{itemize}
+  \item Led end-to-end fine-tuning workflows for internal LLMs, including codebase scraping, dataset creation, training preparation, supervised fine-tuning, and evaluation.
+  \item Developed Python inference workflows for LLMs, object detection models, diffusion models, and third-party generative AI APIs.
+  \item Built and deployed containerized AI services integrated with production applications and internal ML tooling.
+\end{itemize}
+
+\entry
+{Tecnológico de Monterrey}{January 2024 -- June 2024}
+{Adjunct Professor}{Estado de México, Mexico}
+\begin{itemize}
+  \item Taught application development, programming, and electronics, mentoring students through hands-on micro:bit projects.
+\end{itemize}
+
+\entry
+{TELUS International}{February 2020 -- June 2022}
+{Data Analyst}{Remote}
+\begin{itemize}
+  \item Analyzed and annotated digital content to improve training data quality for AI, search, and recommendation systems.
+\end{itemize}
+
+% ---------- Skills ----------
+\section*{Skills}
+\textbf{Cloud \& Infrastructure:} AWS, Azure, Linux, EKS, ECR, EC2, S3, EFS, Route 53, CloudWatch \\
+\textbf{DevOps \& IaC:} Terraform, AWS CDK, Kubernetes, Docker, Git, CI/CD, containerized deployments \\
+\textbf{AI/ML \& MLOps:} PyTorch, TensorFlow, Scikit-learn, LLMs, vLLM, model training, fine-tuning, model serving, model deployment \\
+\textbf{Programming \& Data:} Python, TypeScript, FastAPI, REST APIs, SQL, Pandas, NumPy, PySpark \\
+\textbf{Languages:} Spanish (native), English (fluent), German (intermediate)
+
+% ---------- Certifications ----------
+\section*{Certifications}
+\begin{itemize}
+  \item AWS Certified Generative AI Developer -- Professional \hfill Valid through 2029
+  \item AWS Certified Machine Learning Engineer -- Associate \hfill Valid through 2029
+  \item AWS Certified Solutions Architect -- Associate \hfill Valid through 2027
+  \item HashiCorp Certified: Terraform Associate (004) \hfill Valid through 2028
+  \item Microsoft Certified: Azure Data Scientist Associate \hfill Valid through 2027
+\end{itemize}
+
+% ---------- Education ----------
+\section*{Education}
+
+\entry
+{Tecnológico de Monterrey}{August 2022 -- June 2024}
+{Master of Science in Engineering Sciences}{Estado de México, Mexico}
+\begin{itemize}
+  \item Co-authored an IEEE paper (2023) on a NARMA-L2 neural-network controller as an educational tool for data-driven control.
+\end{itemize}
+
+\entry
+{Tecnológico de Monterrey}{August 2017 -- December 2021}
+{Bachelor of Science in Mechatronics Engineering}{Estado de México, Mexico}
+
+\end{document}

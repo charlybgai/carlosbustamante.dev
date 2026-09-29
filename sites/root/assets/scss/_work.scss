@@ -1,187 +1,284 @@
+@use "colors" as *;
+@use "fonts" as *;
+@use "mixins" as *;
+
 #my_work {
-    background-color: $dark_bg;
-
-    .text-center {
-        margin-bottom: 2rem;
-    }
-
     .filters {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin-bottom: 3rem;
+        display: inline-flex;
         flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-bottom: 2.5rem;
+        padding: 0.35rem;
+        border-radius: 16px;
+        border: 1px solid $border;
+        background: rgba($secondary, 0.25);
 
         button {
-            background: rgba($secondary, 0.2);
-            border: 1px solid rgba($gray, 0.2);
+            padding: 0.55rem 1.1rem;
+            border: 0;
+            border-radius: 12px;
+            background: transparent;
             color: $text_muted;
-            padding: 8px 24px;
-            border-radius: 50px;
-            transition: all 0.3s ease;
+            font-family: $font_main;
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-
-            h4 {
-                margin: 0;
-                font-size: 0.9rem;
-                font-weight: 500;
-            }
+            transition: color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 
             &:hover {
-                border-color: $primary;
                 color: $text_main;
             }
 
-            &.active {
-                background: $primary;
-                border-color: $primary;
-                color: #fff;
-                box-shadow: 0 4px 12px rgba($primary, 0.3);
+            &[aria-pressed="true"] {
+                background: $gradient_brand;
+                color: $on_primary;
+                box-shadow: 0 8px 20px -10px rgba($primary, 0.8);
             }
         }
     }
 
-    .work-items {
-        .item {
-            margin-bottom: 2rem;
+    .work-items .item {
+        margin-bottom: 1.5rem;
+    }
 
-            .wrap {
-                position: relative;
+    // Project card. The whole card is clickable through the title button's ::after.
+    .wrap {
+        @include surface;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+
+        .media {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background: $surface;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+            }
+
+            &::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to top, rgba($dark_bg, 0.7), transparent 55%);
+            }
+        }
+
+        .kind {
+            position: absolute;
+            left: 0.9rem;
+            bottom: 0.8rem;
+            z-index: 1;
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            border: 1px solid $border_strong;
+            background: rgba($dark_bg, 0.75);
+            backdrop-filter: blur(6px);
+            color: $text_main;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            padding: 1.15rem 1.25rem 1.25rem;
+            // script.js equalizes card heights when the grid has more than one column;
+            // any spare space goes above the chips (margin-top: auto), never inside the text
+        }
+
+        .card-title {
+            font-size: 1.08rem;
+            line-height: 1.35;
+        }
+
+        .card-open {
+            all: unset;
+            color: $text_main;
+            cursor: pointer;
+
+            &::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                z-index: 2;
                 border-radius: 20px;
-                overflow: hidden;
-                background: $secondary;
-                cursor: pointer;
-                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            }
 
-                img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-                }
+            &:focus-visible::after {
+                outline: 2px solid $primary;
+                outline-offset: -2px;
+            }
+        }
 
-                &:after {
-                    content: "";
-                    position: absolute;
-                    inset: 0;
-                    background: linear-gradient(to top, rgba($dark_bg, 0.9) 0%, transparent 70%);
-                    opacity: 0;
-                    transition: opacity 0.4s ease;
-                }
+        .summary {
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
 
-                &:hover {
-                    transform: translateY(-10px);
-                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        .chip-list {
+            max-height: 1.9rem; // one row of chips
+            margin-top: auto;
+            overflow: hidden;
+        }
 
-                    img {
-                        transform: scale(1.1);
-                    }
+        .foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.25rem;
+            color: $text_muted;
+            font-family: $font_mono;
+            font-size: 0.8rem;
 
-                    &:after {
-                        opacity: 1;
-                    }
-                }
+            i {
+                color: $primary;
+                font-size: 1.15rem;
+                transition: transform 0.25s ease;
+            }
+        }
+
+        &:hover {
+            transform: translateY(-6px);
+            border-color: rgba($primary, 0.45);
+            box-shadow: 0 32px 64px -32px rgba($primary, 0.5);
+
+            .media img {
+                transform: scale(1.06);
+            }
+
+            .foot i {
+                transform: translateX(4px);
             }
         }
     }
 }
 
-// Modal Customization
+// Project modal
+.modal-backdrop {
+    --bs-backdrop-bg: #{$dark_bg};
+    --bs-backdrop-opacity: 0.82;
+    backdrop-filter: blur(6px);
+}
+
 #workModal {
-    .modal-content {
-        background-color: color.adjust($dark_bg, $lightness: 2%);
-        border: 1px solid rgba($gray, 0.1);
-        border-radius: 24px;
-        overflow: hidden;
-        color: $text_main;
+    .modal-dialog {
+        max-width: 1000px;
     }
 
-    .modal-body {
-        padding: 0;
+    .modal-content {
+        overflow: hidden;
+        border: 1px solid $border_strong;
+        border-radius: 24px;
+        background: $surface;
+        color: $text_main;
+        box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.85);
+    }
 
-        .modal-close-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 10;
-            background: rgba($dark_bg, 0.5);
-            border: none;
-            color: #fff;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+    .modal-close-button {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        z-index: 3;
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid $border_strong;
+        background: rgba($dark_bg, 0.65);
+        backdrop-filter: blur(8px);
+        color: $text_main;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease;
 
-            &:hover {
-                background: $primary;
-            }
+        &:hover {
+            background: $primary;
+            color: $on_primary;
         }
+    }
+
+    .modal-media {
+        position: relative;
+        aspect-ratio: 21 / 9;
+        max-height: 380px;
+        overflow: hidden;
+        background: $dark_bg;
 
         img {
             width: 100%;
-            max-height: 400px;
+            height: 100%;
             object-fit: cover;
         }
 
-        .container-fluid {
-            padding: 2.5rem;
+        &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, $surface, transparent 45%);
+        }
+    }
 
-            .left {
-                .title {
-                    font-size: 2rem;
-                    margin-bottom: 1.5rem;
-                    color: $text_main;
-                }
-                .description {
-                    font-size: 1.05rem;
-                    line-height: 1.8;
-                    color: $text_muted;
-                }
+    .modal-inner {
+        padding: 1.5rem 2.25rem 2.25rem;
+    }
+
+    .modal-type {
+        display: inline-block;
+    }
+
+    .modal-project-title {
+        margin: 0.85rem 0 1rem;
+        font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    }
+
+    .description {
+        font-size: 1.02rem;
+        line-height: 1.75;
+    }
+
+    .meta {
+        padding: 1.5rem;
+        border-radius: 18px;
+        border: 1px solid $border;
+        background: rgba($secondary, 0.18);
+
+        dl > div + div {
+            margin-top: 1.1rem;
+        }
+
+        dt {
+            @include label-caps;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.4rem;
+
+            i {
+                color: $primary;
+                font-size: 1rem;
             }
+        }
 
-            .right {
-                background: rgba($secondary, 0.1);
-                border-radius: 20px;
-                padding: 2rem;
+        dd {
+            color: $text_main;
+        }
 
-                div {
-                    margin-bottom: 1.25rem;
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 1rem;
-
-                    i {
-                        color: $primary;
-                        font-size: 1.25rem;
-                        margin-top: 3px;
-                    }
-
-                    .title {
-                        font-weight: 600;
-                        color: $text_main;
-                        min-width: 90px;
-                    }
-
-                    .value {
-                        color: $text_muted;
-                    }
-                }
-
-                .project-link {
-                    margin-top: 2rem;
-                    a {
-                        @extend .btn-custom-blue;
-                        width: 100%;
-                        padding: 10px;
-                        font-size: 0.9rem;
-                    }
-                }
-            }
+        .project-link {
+            width: 100%;
+            margin-top: 1.5rem;
         }
     }
 }

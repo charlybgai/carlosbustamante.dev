@@ -1,127 +1,158 @@
+@use "colors" as *;
+@use "fonts" as *;
+@use "mixins" as *;
+
 #my_resume {
-    background-color: $dark_bg;
-
-    .custom h2 {
-        text-align: left;
-        margin-bottom: 3rem;
-        font-size: 1.8rem;
-        position: relative;
-        padding-bottom: 10px;
-
-        &:after {
-            content: "";
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 40px;
-            height: 4px;
-            background: $primary;
-            border-radius: 2px;
+    .edu-col {
+        @include above($bp_lg) {
+            position: sticky;
+            top: 2rem;
         }
     }
 
-    .items {
+    .timeline {
         position: relative;
-        padding-left: 3rem;
+        padding-left: 2rem;
 
-        &:before {
+        // Vertical line
+        &::before {
             content: "";
             position: absolute;
-            left: 15px;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(to bottom, $primary, rgba($primary, 0.2));
+            top: 10px;
+            bottom: 10px;
+            left: 7px;
+            width: 2px;
+            border-radius: 2px;
+            background: linear-gradient(to bottom, rgba($primary, 0.85), rgba($accent_blue, 0.35) 60%, rgba($secondary, 0.25));
         }
 
-        .item {
+        > li {
             position: relative;
-            margin-bottom: 3rem;
 
-            &:last-child,
-            &.last {
-                margin-bottom: 0;
+            & + li {
+                margin-top: 1.25rem;
             }
 
-            .icon {
+            // Marker
+            &::before {
+                content: "";
                 position: absolute;
-                left: -3rem;
-                width: 32px;
-                height: 32px;
-                background: $primary;
+                top: 1.7rem;
+                left: calc(-2rem + 1px);
+                width: 14px;
+                height: 14px;
                 border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1;
-                box-shadow: 0 0 0 4px $dark_bg;
-
-                i {
-                    font-size: 1rem;
-                    color: #fff;
-                }
+                border: 2px solid $primary;
+                background: $dark_bg;
             }
 
-            .box {
-                background: rgba($secondary, 0.1);
-                border: 1px solid rgba($gray, 0.1);
-                border-radius: 20px;
-                padding: 2rem;
-                transition: all 0.3s ease;
+            &.is-current::before {
+                background: $primary;
+                box-shadow: 0 0 0 5px rgba($primary, 0.18), 0 0 18px rgba($primary, 0.7);
+            }
+        }
+    }
+
+    .t-card {
+        @include surface(18px);
+        padding: 1.4rem 1.5rem;
+        transition: border-color 0.25s ease, transform 0.25s ease;
+
+        &:hover {
+            border-color: rgba($primary, 0.32);
+            transform: translateX(4px);
+        }
+
+        // Same header layout in every column and viewport: date chip, then title, then company
+        .t-head {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            margin-bottom: 0.9rem;
+        }
+
+        h4 {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.35rem 0.6rem;
+            font-size: 1.12rem;
+        }
+
+        .org {
+            margin-top: 0.2rem;
+            color: $accent_blue_text;
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.5;
+
+            .where {
+                color: $text_muted;
+                font-weight: 400;
+            }
+        }
+
+        .when {
+            order: -1;
+            align-self: flex-start;
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            border: 1px solid rgba($primary, 0.22);
+            background: rgba($primary, 0.1);
+            color: $primary;
+            font-family: $font_mono;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            white-space: nowrap;
+        }
+
+        .badge-now {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            background: $primary;
+            color: $on_primary;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            line-height: 1.4;
+            text-transform: uppercase;
+        }
+
+        .points li {
+            position: relative;
+            padding-left: 1.1rem;
+            color: $text_muted;
+            line-height: 1.65;
+
+            & + li {
+                margin-top: 0.5rem;
+            }
+
+            &::before {
+                content: "";
+                position: absolute;
+                top: 0.68em;
+                left: 0;
+                width: 6px;
+                height: 6px;
+                border-radius: 2px;
+                background: $primary;
+                opacity: 0.85;
+            }
+
+            a {
+                color: $text_main;
+                text-decoration-color: rgba($primary, 0.6);
 
                 &:hover {
-                    background: rgba($secondary, 0.2);
-                    border-color: rgba($primary, 0.3);
-                    transform: translateX(10px);
-                }
-
-                .year {
-                    display: inline-block;
-                    background: rgba($primary, 0.2);
                     color: $primary;
-                    font-family: $font_mono;
-                    font-size: 0.85rem;
-                    padding: 4px 12px;
-                    border-radius: 20px;
-                    margin-bottom: 1rem;
-                    font-weight: 500;
-                }
-
-                .title {
-                    font-size: 1.25rem;
-                    color: $text_main;
-                    margin-bottom: 0.5rem;
-                    font-weight: 700;
-                }
-
-                p {
-                    font-weight: 600;
-                    color: $accent_blue;
-                    margin-bottom: 1rem;
-                }
-
-                ul {
-                    list-style: none;
-                    padding: 0;
-                    margin: 0;
-
-                    li {
-                        position: relative;
-                        padding-left: 1.5rem;
-                        margin-bottom: 0.75rem;
-                        color: $text_muted;
-                        line-height: 1.6;
-
-                        &:before {
-                            content: "→";
-                            position: absolute;
-                            left: 0;
-                            color: $primary;
-                            font-weight: bold;
-                        }
-                    }
                 }
             }
+        }
+
+        .chip-list {
+            margin-top: 1rem;
         }
     }
 }
