@@ -1,0 +1,41 @@
+% Shared layout for CV.tex (English) and CV_ES.tex (Spanish).
+% Moved verbatim from the Overleaf preamble; change styling here, once, for both languages.
+
+% ---------- Packages ----------
+\usepackage[margin=0.6in]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[T1]{fontenc}
+\usepackage{tgtermes}
+\usepackage{microtype}
+
+% ---------- Formatting ----------
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+
+\titleformat{\section}
+  {\bfseries\uppercase}
+  {}
+  {0pt}
+  {}
+  [\vspace{-2pt}\titlerule]
+
+\titlespacing{\section}{0pt}{7pt}{4pt}
+
+\setlist[itemize]{
+  leftmargin=12pt,
+  topsep=1pt,
+  itemsep=2pt,
+  parsep=0pt
+}
+
+% \entry{Organization}{Dates}{Role or degree}{Location}
+% The trailing % signs stop line ends from adding stray spaces (which pushed the
+% right-aligned location of a row ending a paragraph 2.5pt short of the margin).
+\newcommand{\entry}[4]{%
+  \vspace{2pt}%
+  \textbf{#1} \hfill #2 \\
+  \textit{#3} \hfill \textit{#4}%
+}
