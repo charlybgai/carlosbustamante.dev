@@ -43,6 +43,18 @@
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+    // The CDN libraries (Bootstrap, Typed.js, Shuffle.js) load with `async`, so this script
+    // never waits for them: a slow or blocked CDN can't break navigation. Each feature starts
+    // as soon as its library arrives, and simply stays in its plain fallback if it never does.
+    function whenLibraryLoads(isReady, src, start) {
+        if (isReady()) {
+            start();
+            return;
+        }
+        const tag = document.querySelector(`script[src*="${src}"]`);
+        if (tag) tag.addEventListener('load', () => { if (isReady()) start(); }, { once: true });
+    }
+
     /* ------------------------------------------------------------------ *
      * Section routing
      * ------------------------------------------------------------------ */
@@ -122,20 +134,22 @@
      * Hero role animation (skipped when the user prefers reduced motion)
      * ------------------------------------------------------------------ */
     const typedTarget = document.querySelector('#home .typed');
-    if (typedTarget && typeof window.Typed === 'function' && !reduceMotion.matches) {
-        // The markup holds the first role as a fallback (no JS / reduced motion). Typed.js
-        // treats existing text as an already-typed extra string, which would make the first
-        // role appear all at once, so clear it before starting.
-        typedTarget.textContent = '';
-        // eslint-disable-next-line no-new
-        new window.Typed(typedTarget, {
-            strings: STRINGS.roles,
-            contentType: null,
-            loop: true,
-            typeSpeed: 70,
-            backSpeed: 30,
-            backDelay: 1800,
-            startDelay: 300,
+    if (typedTarget && !reduceMotion.matches) {
+        whenLibraryLoads(() => typeof window.Typed === 'function', 'typed.js', () => {
+            // The markup holds the first role as a fallback (no JS / reduced motion / CDN down).
+            // Typed.js treats existing text as an already-typed extra string, which would make
+            // the first role appear all at once, so clear it before starting.
+            typedTarget.textContent = '';
+            // eslint-disable-next-line no-new
+            new window.Typed(typedTarget, {
+                strings: STRINGS.roles,
+                contentType: null,
+                loop: true,
+                typeSpeed: 70,
+                backSpeed: 30,
+                backDelay: 1800,
+                startDelay: 300,
+            });
         });
     }
 
@@ -147,11 +161,18 @@
     const filterButtons = Array.from(document.querySelectorAll('#my_work .filters button[data-group]'));
     const filterStatus = document.querySelector('#my_work .filter-status');
     let shuffle = null;
+    let activeGroup = 'all';
 
-    if (grid && typeof window.Shuffle === 'function') {
-        shuffle = new window.Shuffle(grid, {
-            itemSelector: '.item',
-            speed: reduceMotion.matches ? 0 : 300,
+    if (grid) {
+        whenLibraryLoads(() => typeof window.Shuffle === 'function', 'shuffle', () => {
+            // Items hidden by the plain fallback filter are handed back to Shuffle
+            workItems.forEach((item) => { item.hidden = false; });
+            shuffle = new window.Shuffle(grid, {
+                itemSelector: '.item',
+                speed: reduceMotion.matches ? 0 : 300,
+                group: activeGroup === 'all' ? window.Shuffle.ALL_ITEMS : activeGroup,
+            });
+            if (currentId === 'my_work') relayoutWork();
         });
     }
 
@@ -198,6 +219,7 @@
     filterButtons.forEach((button) => {
         button.addEventListener('click', () => {
             const group = button.dataset.group;
+            activeGroup = group;
             filterButtons.forEach((other) => other.setAttribute('aria-pressed', String(other === button)));
 
             let visible;
@@ -223,10 +245,15 @@
      * Project modal (Bootstrap handles the focus trap and Escape)
      * ------------------------------------------------------------------ */
     const modalEl = document.getElementById('workModal');
-    const modal = modalEl && window.bootstrap ? window.bootstrap.Modal.getOrCreateInstance(modalEl) : null;
     let lastTrigger = null;
 
+    // Created on first use, because Bootstrap loads asynchronously
+    function getModal() {
+        return modalEl && window.bootstrap ? window.bootstrap.Modal.getOrCreateInstance(modalEl) : null;
+    }
+
     function openProject(card, trigger) {
+        const modal = getModal();
         if (!modal) return;
         const data = card.dataset;
         const image = modalEl.querySelector('.modal-media img');

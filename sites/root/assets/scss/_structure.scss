@@ -2,6 +2,18 @@
 @use "fonts" as *;
 @use "mixins" as *;
 
+// Visually hidden but still read by screen readers. Bootstrap ships the same class; this
+// copy keeps the text hidden if Bootstrap's CSS (loaded from a CDN) fails to load.
+.visually-hidden {
+    @include sr-only;
+}
+
+// Same idea for the project dialog: it stays hidden until Bootstrap's JS opens it,
+// even when Bootstrap's CSS isn't available.
+.modal:not(.show) {
+    display: none;
+}
+
 // Keyboard focus ring used everywhere (inputs override it with their own glow)
 :focus-visible {
     outline: 2px solid $primary;
