@@ -3,8 +3,8 @@
 Static bilingual (EN/ES) portfolio for Carlos Bustamante at https://carlosbustamante.dev.
 Plain HTML + SCSS + vanilla JS on S3/CloudFront. The contact form is a Python Lambda
 behind API Gateway, with Google reCAPTCHA Enterprise. All infrastructure is in Terraform.
-There's no framework, no bundler and no package.json. The only automated tests are the Lambda's
-unit tests.
+There's no framework, no bundler and no package.json. Automated tests cover the Lambda,
+offline cache-buster checks, and the CloudTrail sign-in event contract.
 
 ## Layout
 
@@ -171,6 +171,7 @@ tools/                      # Asset builders and offline cache-buster checker/te
 ```bash
 terraform -chdir=infra fmt -check -recursive
 terraform -chdir=infra validate
+terraform -chdir=infra test # offline regression tests, all providers mocked
 terraform -chdir=infra/bootstrap validate
 python3 -m py_compile functions/send_email/lambda_function.py
 python3 -m unittest discover -s functions/send_email
