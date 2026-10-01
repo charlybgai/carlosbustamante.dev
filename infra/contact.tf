@@ -21,9 +21,24 @@ resource "aws_iam_role" "send_email" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
-  role       = aws_iam_role.send_email.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+# Logs: only this function's own log group (managed below). The AWS managed
+# AWSLambdaBasicExecutionRole allowed creating and writing any log group in the account,
+# which also let Lambda recreate the group without a retention limit if it was ever deleted.
+resource "aws_iam_role_policy" "send_email_logs" {
+  name = "WriteOwnLogs"
+  role = aws_iam_role.send_email.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "WriteFunctionLogs"
+        Effect   = "Allow"
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = "${aws_cloudwatch_log_group.send_email.arn}:*"
+      }
+    ]
+  })
 }
 
 data "aws_caller_identity" "current" {}
@@ -237,10 +252,29 @@ resource "aws_api_gateway_method_settings" "prod" {
   }
 }
 
+# Only the prod stage's POST /sendemail may invoke the function (the OPTIONS preflight is a
+# MOCK integration and never reaches it). Changing source_arn replaces the statement.
 resource "aws_lambda_permission" "api_gateway" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.send_email.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.send_email.execution_arn}/*/*"
+  source_arn    = "${aws_api_gateway_rest_api.send_email.execution_arn}/${aws_api_gateway_stage.prod.stage_name}/${aws_api_gateway_method.sendemail_post.http_method}${aws_api_gateway_resource.sendemail.path}"
+}
+
+# A duplicate statement created in the console before the API was in Terraform. It's adopted
+# here only so that removing the block below (after the first apply) deletes it:
+#   1. apply with this import + resource (Terraform takes it over, no change in AWS)
+#   2. delete both blocks and apply again (Terraform deletes the statement)
+import {
+  to = aws_lambda_permission.console_leftover
+  id = "SendEmailFunction/9c4e60ef-73b3-5949-a1bb-7084c4f65b46"
+}
+
+resource "aws_lambda_permission" "console_leftover" {
+  statement_id  = "9c4e60ef-73b3-5949-a1bb-7084c4f65b46"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.send_email.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.send_email.execution_arn}/*/POST/sendemail"
 }
