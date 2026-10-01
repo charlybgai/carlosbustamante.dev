@@ -37,6 +37,18 @@ variable "contact_recipient_email" {
   default     = "me@carlosbustamante.dev"
 }
 
+variable "alert_email" {
+  description = "Email address for contact form alerts (defaults to contact_recipient_email)"
+  type        = string
+  default     = null
+}
+
+variable "recaptcha_daily_assessment_cap" {
+  description = "Most reCAPTCHA assessments the project may create per day. 300/day keeps a month under the 10,000 free assessments."
+  type        = number
+  default     = 300
+}
+
 variable "subdomains" {
   description = "Map of subdomains to create"
   type        = map(string)
