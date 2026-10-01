@@ -28,6 +28,7 @@ jobs:
       - run: terraform -chdir=infra fmt -check -recursive
       - run: terraform -chdir=infra init -backend=false -lockfile=readonly -input=false
       - run: terraform -chdir=infra validate
+      - run: terraform -chdir=infra test
       - run: terraform -chdir=infra/bootstrap init -backend=false -lockfile=readonly -input=false
       - run: terraform -chdir=infra/bootstrap validate
 

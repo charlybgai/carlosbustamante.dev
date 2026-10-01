@@ -2,9 +2,11 @@
 # from every currently enabled region to us-east-1 and the existing confirmed SNS topic.
 locals {
   signin_rule_name = "portfolio-break-glass-sign-in"
+  # Keep trust stable when only the rule's event pattern changes.
+  signin_rule_arn = "arn:${data.aws_partition.current.partition}:events:us-east-1:${data.aws_caller_identity.current.account_id}:rule/${local.signin_rule_name}"
   signin_pattern = jsonencode({
     source        = ["aws.signin"]
-    "detail-type" = ["AWS Console Signin via CloudTrail"]
+    "detail-type" = ["AWS Console Sign In via CloudTrail"]
     account       = [data.aws_caller_identity.current.account_id]
     detail = {
       eventSource = ["signin.amazonaws.com"]
@@ -46,7 +48,7 @@ data "aws_iam_policy_document" "signin_notify_trust" {
     condition {
       test     = "ArnEquals"
       variable = "aws:SourceArn"
-      values   = [aws_cloudwatch_event_rule.signin.arn]
+      values   = [local.signin_rule_arn]
     }
     condition {
       test     = "StringEquals"
