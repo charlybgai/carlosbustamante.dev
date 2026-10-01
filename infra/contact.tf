@@ -205,6 +205,12 @@ resource "aws_api_gateway_gateway_response" "cors" {
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin" = "'${local.allowed_origin}'"
   }
+
+  # API Gateway's default body for these responses. It's set explicitly because AWS stores it
+  # when the response is customized, and leaving it out makes every plan show a change.
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
 }
 
 # A deployment is a snapshot of the API. `triggers` hashes every resource that defines the API,
@@ -262,19 +268,3 @@ resource "aws_lambda_permission" "api_gateway" {
   source_arn    = "${aws_api_gateway_rest_api.send_email.execution_arn}/${aws_api_gateway_stage.prod.stage_name}/${aws_api_gateway_method.sendemail_post.http_method}${aws_api_gateway_resource.sendemail.path}"
 }
 
-# A duplicate statement created in the console before the API was in Terraform. It's adopted
-# here only so that removing the block below (after the first apply) deletes it:
-#   1. apply with this import + resource (Terraform takes it over, no change in AWS)
-#   2. delete both blocks and apply again (Terraform deletes the statement)
-import {
-  to = aws_lambda_permission.console_leftover
-  id = "SendEmailFunction/9c4e60ef-73b3-5949-a1bb-7084c4f65b46"
-}
-
-resource "aws_lambda_permission" "console_leftover" {
-  statement_id  = "9c4e60ef-73b3-5949-a1bb-7084c4f65b46"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.send_email.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.send_email.execution_arn}/*/POST/sendemail"
-}
