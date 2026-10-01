@@ -80,7 +80,7 @@ terraform apply
 
 ### CI checks
 
-Every pull request and push to `main` runs Terraform formatting/validation, Lambda unit tests,
+Every pull request and push to `main` runs Terraform formatting/validation and offline regression tests, Lambda unit tests,
 JavaScript syntax and HTML validation, SCSS compilation comparison, ShellCheck, and offline
 cache-buster checks. Jobs use pinned actions, read-only repository permissions, and no cloud
 credentials. Standard GitHub runners are free for this public repository.
