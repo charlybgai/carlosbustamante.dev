@@ -43,6 +43,30 @@ img {
   height: auto;
 }
 
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 700 800;
+  font-display: swap;
+  src: url("../fonts/montserrat-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fira Code";
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url("../fonts/fira-code-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 body {
   background: #0F172A;
   color: #F8FAFC;
@@ -96,6 +120,15 @@ strong {
 ::selection {
   background: rgba(16, 185, 129, 0.35);
   color: #F8FAFC;
+}
+
+.ico {
+  display: inline-block;
+  flex: none;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  fill: currentColor;
 }
 
 .visually-hidden {
@@ -213,7 +246,9 @@ main > section .container {
   margin-bottom: 1.5rem;
   font-size: 1.3rem;
 }
-.sub-head i {
+.sub-head .ico {
+  font-size: 1.2rem;
+  padding: calc((38px - 2px - 1em) / 2);
   flex: none;
   display: grid;
   place-items: center;
@@ -223,7 +258,6 @@ main > section .container {
   color: #10B981;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.22);
-  font-size: 1.2rem;
 }
 
 .chip-list {
@@ -341,7 +375,7 @@ main > section .container {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
-.btn-custom-blue i {
+.btn-custom-blue .ico {
   font-size: 1.2rem;
 }
 .btn-custom-blue:active {
@@ -374,7 +408,7 @@ main > section .container {
 .btn-custom-blue.is-loading .spinner {
   display: inline-block;
 }
-.btn-custom-blue.is-loading i {
+.btn-custom-blue.is-loading .ico {
   display: none;
 }
 
@@ -396,7 +430,7 @@ main > section .container {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
-.btn-custom-dark i {
+.btn-custom-dark .ico {
   font-size: 1.2rem;
 }
 .btn-custom-dark:active {
@@ -617,6 +651,15 @@ main > section .container {
   display: flex;
   align-items: center;
   overflow: hidden;
+}
+@media (max-width: 991.98px) {
+  #home {
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+  }
+}
+#home {
   isolation: isolate;
   padding-top: 72px;
   padding-bottom: 72px;
@@ -773,7 +816,7 @@ main > section .container {
   text-decoration: none;
   transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
 }
-#home .socials a svg {
+#home .socials a .x-logo {
   width: 18px;
   height: 18px;
 }
@@ -841,6 +884,42 @@ main > section .container {
   line-height: 1.45;
   color: #94A3B8;
   text-wrap: balance;
+}
+
+#home .motion-toggle {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(7.4613003096%, 11.4406604747%, 20.8916408669%, 0.7);
+  color: #94A3B8;
+  font: 500 0.75rem "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+#home .motion-toggle:hover {
+  color: #F8FAFC;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+@media (max-width: 991.98px) {
+  #home .motion-toggle {
+    position: static;
+    order: 2;
+    margin: 1.5rem auto 0;
+  }
+}
+#home.motion-paused .orb,
+#home.motion-paused .status-pill .dot {
+  animation-play-state: paused;
+}
+#home.motion-paused .typed-cursor {
+  animation: none;
 }
 
 @keyframes orb-drift {
@@ -964,7 +1043,9 @@ main > section .container {
   gap: 0.85rem;
   margin-bottom: 1.1rem;
 }
-#about_me .skill-card .skill-head i {
+#about_me .skill-card .skill-head .ico {
+  font-size: 1.35rem;
+  padding: calc((42px - 2px - 1em) / 2);
   flex: none;
   display: grid;
   place-items: center;
@@ -974,7 +1055,6 @@ main > section .container {
   color: #10B981;
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.22);
-  font-size: 1.35rem;
 }
 #about_me .skill-card .skill-head h4 {
   font-size: 1.05rem;
@@ -1362,15 +1442,28 @@ main > section .container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   padding-top: 0.25rem;
   color: #94A3B8;
   font-family: "Fira Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
   font-size: 0.8rem;
 }
-#my_work .wrap .foot i {
+#my_work .wrap .foot .ico {
   color: #10B981;
   font-size: 1.15rem;
   transition: transform 0.25s ease;
+}
+#my_work .wrap .card-link {
+  position: relative;
+  z-index: 3;
+  margin-left: auto;
+  color: #10B981;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+#my_work .wrap .card-link + .ico {
+  display: none;
 }
 #my_work .wrap:hover {
   transform: translateY(-6px);
@@ -1380,8 +1473,19 @@ main > section .container {
 #my_work .wrap:hover .media img {
   transform: scale(1.06);
 }
-#my_work .wrap:hover .foot i {
+#my_work .wrap:hover .foot .ico {
   transform: translateX(4px);
+}
+
+html:not(.js) #my_work .wrap[data-project-link=""] .foot .ico {
+  display: none;
+}
+
+.js #my_work .wrap .card-link {
+  display: none;
+}
+.js #my_work .wrap .card-link + .ico {
+  display: inline-block;
 }
 
 .modal-backdrop {
@@ -1475,7 +1579,7 @@ main > section .container {
   gap: 0.4rem;
   margin-bottom: 0.4rem;
 }
-#workModal .meta dt i {
+#workModal .meta dt .ico {
   color: #10B981;
   font-size: 1rem;
 }
@@ -1503,6 +1607,9 @@ main > section .container {
   height: 2px;
   background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
   opacity: 0.85;
+}
+#contact_me noscript .form-status {
+  margin: 0 0 1.5rem;
 }
 #contact_me .form-grid {
   display: grid;
@@ -1651,6 +1758,43 @@ main > section .container {
 }
 #contact_me a.info-item:hover .value {
   color: #10B981;
+}
+
+main.not-found {
+  display: grid;
+  place-items: center;
+  padding: 48px 20px;
+}
+
+.not-found .card {
+  background: linear-gradient(180deg, rgba(9.040247678%, 13.8617131063%, 25.3126934985%, 0.72) 0%, rgba(7.4613003096%, 11.4406604747%, 20.8916408669%, 0.72) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 24px;
+  box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.04), 0 24px 48px -32px rgba(0, 0, 0, 0.7);
+  width: min(560px, 100%);
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+.not-found .code {
+  margin-bottom: 1.25rem;
+  font-family: "Fira Code", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  color: #10B981;
+}
+.not-found h1,
+.not-found h2 {
+  margin-bottom: 0.6rem;
+  font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem);
+}
+.not-found p {
+  margin-bottom: 1.5rem;
+}
+.not-found hr {
+  margin: 2rem 0;
+  border: 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  opacity: 1;
 }
 
 @media (min-width: 992px) and (max-width: 1439.98px) {

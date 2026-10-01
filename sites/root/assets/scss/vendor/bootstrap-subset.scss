@@ -1,0 +1,29 @@
+// Bootstrap 5.3.3, reduced to the parts this site uses: CSS variables, reboot, containers,
+// grid (columns, rows, gutters), the fade transition, the modal and `justify-content-*`.
+//
+// Built by tools/build-bootstrap.sh into assets/css/bootstrap.css, which is served from this
+// domain so a slow CDN can't block the first paint. Rebuild it only when changing this list or
+// bumping Bootstrap. The site's own styles stay in main.scss.
+//
+// Uses @import because that's how Bootstrap 5.3 exposes its source.
+
+@import "mixins/banner";
+@include bsBanner("Subset");
+
+@import "functions";
+@import "variables";
+@import "variables-dark";
+@import "maps";
+@import "mixins";
+@import "utilities";
+
+// Only the utility classes the pages use
+$utilities: map-get-multiple($utilities, ("justify-content"));
+
+@import "root";
+@import "reboot";
+@import "containers";
+@import "grid";
+@import "transitions";
+@import "modal";
+@import "utilities/api";

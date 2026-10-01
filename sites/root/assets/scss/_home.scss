@@ -6,6 +6,14 @@
     display: flex;
     align-items: center;
     overflow: hidden;
+
+    // Tablets and phones: content first, then the pause pill centered below it
+    @include below($bp_lg) {
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+    }
+
     isolation: isolate;
     padding-top: 72px;
     padding-bottom: 72px;
@@ -190,7 +198,7 @@
             text-decoration: none;
             transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
 
-            svg {
+            .x-logo {
                 width: 18px;
                 height: 18px;
             }
@@ -274,6 +282,51 @@
             line-height: 1.45;
             color: $text_muted;
             text-wrap: balance; // avoids a single word alone on the last line
+        }
+    }
+}
+
+// Pause button for the hero's looping motion (shown by script.js)
+#home {
+    .motion-toggle {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid $border;
+        background: rgba($surface, 0.7);
+        color: $text_muted;
+        font: 500 0.75rem $font_main;
+        cursor: pointer;
+        transition: color 0.2s ease, border-color 0.2s ease;
+
+        &:hover {
+            color: $text_main;
+            border-color: $border_strong;
+        }
+
+        // Tablets and phones: the bottom edge of the section sits under the fixed bottom bar, so
+        // the pill moves into the normal flow, centered below the hero content
+        @include below($bp_lg) {
+            position: static;
+            order: 2;
+            margin: 1.5rem auto 0;
+        }
+    }
+
+    &.motion-paused {
+        .orb,
+        .status-pill .dot {
+            animation-play-state: paused;
+        }
+
+        .typed-cursor {
+            animation: none;
         }
     }
 }

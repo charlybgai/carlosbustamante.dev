@@ -1,0 +1,44 @@
+@use "colors" as *;
+@use "fonts" as *;
+@use "mixins" as *;
+
+// Bilingual not-found page (404.html). Its `main` has no sidebar, so the rail padding is reset.
+main.not-found {
+    display: grid;
+    place-items: center;
+    padding: 48px 20px;
+}
+
+.not-found {
+    .card {
+        @include surface(24px);
+        width: min(560px, 100%);
+        padding: 2.5rem 2rem;
+        text-align: center;
+    }
+
+    .code {
+        margin-bottom: 1.25rem;
+        font-family: $font_mono;
+        font-size: 1rem;
+        letter-spacing: 0.1em;
+        color: $primary;
+    }
+
+    h1,
+    h2 {
+        margin-bottom: 0.6rem;
+        font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.2rem);
+    }
+
+    p {
+        margin-bottom: 1.5rem;
+    }
+
+    hr {
+        margin: 2rem 0;
+        border: 0;
+        border-top: 1px solid $border;
+        opacity: 1;
+    }
+}

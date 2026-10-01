@@ -4,6 +4,15 @@
 % ---------- Packages ----------
 \usepackage[margin=0.6in]{geometry}
 \usepackage[hidelinks]{hyperref}
+% PDF metadata (title shown in browser tabs and file previews). Each CV sets \cvtitle and
+% \cvsubject before \input{style}.
+\hypersetup{
+  pdftitle={\cvtitle},
+  pdfauthor={Carlos Alberto Bustamante Gaytán},
+  pdfsubject={\cvsubject},
+  pdfkeywords={Cloud, MLOps, AWS, Kubernetes, Terraform, AI Infrastructure},
+  pdflang={\cvlang},
+}
 \usepackage{titlesec}
 \usepackage{enumitem}
 \usepackage[T1]{fontenc}

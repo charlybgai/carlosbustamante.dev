@@ -137,16 +137,34 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 0.75rem;
             padding-top: 0.25rem;
             color: $text_muted;
             font-family: $font_mono;
             font-size: 0.8rem;
 
-            i {
+            .ico {
                 color: $primary;
                 font-size: 1.15rem;
                 transition: transform 0.25s ease;
             }
+        }
+
+        // Direct project link. Without JS the card button does nothing, so this link is shown
+        // instead of the arrow and sits above the card's click overlay. With JS the card opens
+        // the details dialog, which has the same link, so this one is hidden.
+        .card-link {
+            position: relative;
+            z-index: 3;
+            margin-left: auto;
+            color: $primary;
+            font-family: $font_main;
+            font-weight: 600;
+            text-underline-offset: 3px;
+        }
+
+        .card-link + .ico {
+            display: none;
         }
 
         &:hover {
@@ -158,10 +176,23 @@
                 transform: scale(1.06);
             }
 
-            .foot i {
+            .foot .ico {
                 transform: translateX(4px);
             }
         }
+    }
+}
+
+// Without JS a card with no project link has nothing to open, so its arrow is hidden too
+html:not(.js) #my_work .wrap[data-project-link=""] .foot .ico {
+    display: none;
+}
+
+.js #my_work .wrap .card-link {
+    display: none;
+
+    + .ico {
+        display: inline-block;
     }
 }
 
@@ -266,7 +297,7 @@
             gap: 0.4rem;
             margin-bottom: 0.4rem;
 
-            i {
+            .ico {
                 color: $primary;
                 font-size: 1rem;
             }

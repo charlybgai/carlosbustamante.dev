@@ -20,6 +20,12 @@ PUBLISH=1
 command -v docker >/dev/null || { echo "error: docker is required" >&2; exit 1; }
 mkdir -p "$BUILD_DIR"
 
+# Reproducible output: the same sources always give byte-identical PDFs. The PDF dates and
+# document ID come from the last commit that touched cv/ (not from the clock), and every run
+# compiles from scratch (-g) so a stale latexmk cache can't keep old timestamps.
+SOURCE_DATE_EPOCH=$(git -C "$CV_DIR" log -1 --format=%ct -- . 2>/dev/null || true)
+SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH:-0}
+
 for doc in CV CV_ES; do
     echo "-> Building $doc.pdf"
     # Run as the host user so files in build/ aren't owned by root.
@@ -27,9 +33,10 @@ for doc in CV CV_ES; do
     if ! docker run --rm --network none \
         --user "$(id -u):$(id -g)" \
         -e HOME=/tmp \
+        -e SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" -e FORCE_SOURCE_DATE=1 \
         -v "$CV_DIR:/cv" -w /cv \
         "$IMAGE" \
-        latexmk -pdf -no-shell-escape -interaction=nonstopmode -halt-on-error \
+        latexmk -g -pdf -no-shell-escape -interaction=nonstopmode -halt-on-error \
             -outdir=build -quiet "$doc.tex" >"$BUILD_DIR/$doc.build.log" 2>&1; then
         echo "error: $doc failed to build. Last lines of the log:" >&2
         tail -n 30 "$BUILD_DIR/$doc.log" >&2 2>/dev/null || tail -n 30 "$BUILD_DIR/$doc.build.log" >&2

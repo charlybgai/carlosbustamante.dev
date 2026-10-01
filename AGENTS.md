@@ -16,6 +16,9 @@ sites/root/                 # Deployed as-is to S3 (the site root)
   assets/js/script.js       # Shared JS for both pages. UI strings are in its STRINGS table
   assets/scss/              # SCSS source: main.scss @use's the partials _*.scss
   assets/css/main.css       # Compiled CSS (committed; this is what the browser loads)
+  assets/css/bootstrap.css  # Bootstrap 5.3.3 subset, built by tools/build-bootstrap.sh (don't edit)
+  assets/fonts/             # Self-hosted Inter, Montserrat, Fira Code (Latin woff2) + OFL licenses
+  assets/images/icons.svg   # SVG icon sprite (Line Awesome glyphs), built by tools/build-icons.py
   assets/images/            # WebP images: certs/, works/, photos, avatar; og-card.jpg (social card);
                             #   hero-aurora.webp = desktop-only home background (set in _home.scss)
   assets/files/CV.pdf       # Resume PDFs (CV.pdf = EN, CV_ES.pdf = ES). Source of truth for career facts
@@ -31,6 +34,7 @@ infra/                      # Terraform: AWS (us-east-1) + Google provider (+ go
   terraform.tfvars          # Gitignored. Holds real values; don't commit it
 deploy.sh                   # Uploads sites/root to S3 (with Cache-Control), deletes extras, invalidates CloudFront
 cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared style.tex, build.sh
+tools/                      # build-bootstrap.sh (CSS subset) and build-icons.py (icon sprite)
 ```
 
 ## How the pieces connect
@@ -78,9 +82,21 @@ cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared st
   `data-project-link` (empty = no link button), and optional `data-link-label` and
   `data-image-position` (CSS `object-position` for the wide popup header, e.g. `center 42%`) on `.wrap`.
   The visible card title is a `<button class="card-open">`, which makes the whole card clickable.
-- Libraries load from CDNs with SRI hashes: Bootstrap 5.3.3, Typed.js 2.1.0, Shuffle 6.1.0,
-  and Line Awesome 1.3.0 (icons, no SRI). Update the `integrity` hash if you bump a version.
-  Fonts (Inter, Montserrat, Fira Code) load through `<link>` tags in `<head>`.
+  Each card with a link also has a real `<a class="card-link">` in its footer: CSS hides it when
+  JS runs, so it only shows without JS. If Bootstrap's JS never loads, clicking a card opens
+  its link directly. Keep `data-project-link` and the `card-link` href in sync.
+- Everything the first paint needs is served from this domain: `bootstrap.css` (subset),
+  `main.css`, the fonts (preloaded in `<head>`) and the icon sprite. No third-party stylesheet
+  is allowed in `<head>`, because a stalled CDN would block rendering.
+  - To use another Bootstrap class or component, add its module to
+    `assets/scss/vendor/bootstrap-subset.scss`, run `./tools/build-bootstrap.sh` and bump the
+    `bootstrap.css?v=` tag.
+  - Icons are `<svg class="ico" aria-hidden="true" focusable="false"><use href="…/icons.svg?v=TAG#name"></use></svg>`.
+    To add one, add its Line Awesome name to `tools/build-icons.py`, run
+    `uvx --from 'fonttools[woff]==4.60.1' python tools/build-icons.py`, and bump `icons.svg?v=`
+    in every page. Style icons through `.ico`, not `i`.
+- The JS libraries load from CDNs with SRI hashes: Bootstrap 5.3.3 (JS bundle), Typed.js 2.1.0,
+  Shuffle 6.1.0. Update the `integrity` hash if you bump a version.
 - The three JS libraries load with `async`, and `script.js` must never assume they're there:
   use `whenLibraryLoads()` to start a feature when its library arrives, and keep a working
   fallback (static role text, plain show/hide filters, no modal). This is what keeps navigation
@@ -93,7 +109,11 @@ cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared st
 - Images are WebP with explicit `width`/`height` and `loading="lazy"` below the fold.
 - Accessibility to keep: focus-visible ring, skip link, nav labels that stay in the
   accessibility tree (tooltips use opacity, not `visibility`), modal focus trap + focus return,
-  `aria-pressed` filters, `aria-live` form status, `prefers-reduced-motion` support.
+  `aria-pressed` filters, `aria-live` form status, `prefers-reduced-motion` support, the hero's
+  pause/play button for looping motion (WCAG 2.2.2), a visually hidden "(opens in a new tab)"
+  on every `target="_blank"` link, and the `<noscript>` note above the contact form.
+- The hero portrait is a `<picture>` whose `<source media="(min-width: 992px)">` is the only
+  real image, so phones and tablets (where it's hidden) don't download it.
 - The reCAPTCHA badge is hidden with `visibility: hidden`. That's only allowed because the
   attribution text is shown next to the form, so keep that text.
 
@@ -108,10 +128,11 @@ cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared st
    npx sass@1.105.0 sites/root/assets/scss/main.scss sites/root/assets/css/main.css
    ```
    Commit the SCSS and the regenerated CSS/map together.
-3. **Bump the cache-busters** (`main.css?v=YYYYMMDD-tag`, `script.js?v=YYYYMMDD-tag`) in both
-   HTML files when you change CSS or JS. `404.html` links `main.css` too. Browsers cache these
-   files for a year, so this is required: `deploy.sh` refuses to deploy a changed file whose
-   tag wasn't bumped, or pages that disagree on the tag.
+3. **Bump the cache-busters** (`?v=` on `main.css`, `bootstrap.css`, `script.js` and
+   `icons.svg`) in every page that loads the file when you change it. `404.html` links
+   `main.css` too. Browsers cache CSS/JS for a year, so this is required: `deploy.sh` refuses to
+   deploy a changed file whose tag wasn't bumped, pages that disagree on a tag, or a CSS/JS file
+   that no page loads with `?v=`.
 4. When page content changes, update `<lastmod>` in `sitemap.xml`. When metadata changes,
    update the JSON-LD block and `<meta>` tags in both HTML files.
 5. Career facts (roles, dates, certifications) must match the CV PDFs. Don't invent metrics.
@@ -133,6 +154,9 @@ cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared st
   requirement is Docker. The first run downloads the image (about 2.6 GB).
 - Each CV must stay exactly one US Letter page. The script fails if a CV spills onto a second
   page and warns about lines that overflow the margin.
+- Builds are reproducible: PDF dates come from the last commit that touched `cv/`, so the same
+  sources give byte-identical PDFs. Title/author metadata is set in `style.tex` from each CV's
+  `\cvtitle`/`\cvsubject`. The site's download links save them as `Carlos_Bustamante_CV(_ES).pdf`.
 - Commit the `.tex` changes and the regenerated PDFs together. If the career facts change, update
   the site too (rule 5).
 - The GlobalLogic role is client work for Ring (an Amazon company). Don't mention internal

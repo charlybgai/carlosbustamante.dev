@@ -94,16 +94,25 @@ check_git() {
 
 check_cache_busters() {
     echo "   -> Checking cache-busters..."
-    local asset name pages_token deployed_html deployed_token
+    local pages=("$DIR/index.html" "$DIR/es/index.html" "$DIR/404.html")
+    local asset tokens deployed_html deployed_token
     # The deployed index.html tells which ?v= tags are live (missing on a first deploy)
     deployed_html=$(aws s3 cp "$BUCKET/index.html" - 2>/dev/null || true)
 
-    for asset in assets/css/main.css assets/js/script.js; do
-        name=${asset##*/}
+    # Every asset any page references with ?v= (CSS, JS, the icon sprite...)
+    local assets
+    assets=$(grep -ohE '(href|src)="[^"]*\?v=[^"#]*' "${pages[@]}" |
+        sed -E 's/^(href|src)="//; s/\?v=.*//; s#^(\.\./|/)##' | sort -u)
+
+    for asset in $assets; do
+        if [[ ! -f "$DIR/$asset" ]]; then
+            problem "The pages reference $asset?v=..., but $DIR/$asset doesn't exist"
+            continue
+        fi
         # All pages that load the asset must use the same tag
-        pages_token=$(grep -oh "${name}?v=[^\"]*" "$DIR/index.html" "$DIR/es/index.html" "$DIR/404.html" | sort -u || true)
-        if [[ $(wc -l <<<"$pages_token") -ne 1 ]]; then
-            problem "The pages don't agree on the ${name} cache-buster: $(tr '\n' ' ' <<<"$pages_token")"
+        tokens=$(grep -ohE "${asset##*/}\?v=[^\"#]*" "${pages[@]}" | sort -u || true)
+        if [[ $(wc -l <<<"$tokens") -ne 1 ]]; then
+            problem "The pages don't agree on the ${asset##*/} cache-buster: $(tr '\n' ' ' <<<"$tokens")"
             continue
         fi
         [[ -z "$deployed_html" ]] && continue
@@ -112,10 +121,17 @@ check_cache_busters() {
             --query ETag --output text 2>/dev/null | tr -d '"')" ]]; then
             continue
         fi
-        deployed_token=$(grep -o "${name}?v=[^\"]*" <<<"$deployed_html" | head -n 1 || true)
-        [[ "$pages_token" != "$deployed_token" ]] ||
-            problem "${name} changed but its cache-buster is still ${pages_token#*\?}; bump it in all pages"
+        deployed_token=$(grep -oE "${asset##*/}\?v=[^\"#]*" <<<"$deployed_html" | head -n 1 || true)
+        [[ "$tokens" != "$deployed_token" ]] ||
+            problem "${asset##*/} changed but its cache-buster is still ${tokens#*\?}; bump it in all pages"
     done
+
+    # CSS and JS are cached for a year, so each one must be loaded with a ?v= tag
+    local file rel
+    while IFS= read -r -d '' file; do
+        rel=${file#"$DIR"/}
+        grep -qF "$rel" <<<"$assets" || problem "$rel is cached for a year but no page loads it with ?v="
+    done < <(find "$DIR/assets" \( -name '*.css' -o -name '*.js' \) -type f -print0)
 }
 
 # Lists what a deploy changes, comparing file contents (local MD5 vs S3 ETag). `aws s3 sync`
