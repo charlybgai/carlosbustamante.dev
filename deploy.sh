@@ -14,6 +14,9 @@
 # files in the bucket that don't exist locally are deleted.
 set -euo pipefail
 
+# Site deployments use the limited IAM Identity Center role unless explicitly overridden.
+export AWS_PROFILE="${AWS_PROFILE:-portfolio-deploy}"
+
 BUCKET_NAME="carlosbustamante.dev"
 BUCKET="s3://${BUCKET_NAME}"
 DIST_ID="E6VISQC42W7BR"
@@ -171,7 +174,12 @@ upload_group() {
 }
 
 echo -e "${BLUE}🚀 Deploying the portfolio$([[ $DRYRUN -eq 1 ]] && echo ' (dry run)')...${NC}"
-aws sts get-caller-identity >/dev/null || { echo "error: AWS credentials aren't working" >&2; exit 1; }
+CALLER_ARN=$(aws sts get-caller-identity --query Arn --output text) ||
+    { echo "error: AWS credentials aren't working" >&2; exit 1; }
+if [[ ! "$CALLER_ARN" =~ ^arn:aws:sts::[0-9]{12}:assumed-role/AWSReservedSSO_PortfolioDeploy_[A-Za-z0-9]+/[^/]+$ ]]; then
+    echo "error: sign in with the portfolio-deploy SSO profile before deploying" >&2
+    exit 1
+fi
 check_git
 check_cache_busters
 
