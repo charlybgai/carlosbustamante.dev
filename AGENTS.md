@@ -31,10 +31,14 @@ infra/                      # Terraform: AWS (us-east-1) + Google provider (+ go
   s3.tf  cloudfront.tf  route53.tf  contact.tf  recaptcha.tf
   monitoring.tf             # SNS email topic + alarms on contact API 5XX and Lambda errors
   backend.tf                # Remote state: s3://carlosbustamante-ops-terraform-state
+  security.tf               # External Access Analyzer + management-event CloudTrail (90-day logs)
+  signin.tf, signin-regions.tf # Root/Charly console sign-in alerts in every enabled region
+  bootstrap/                # State bucket policy/lifecycle; separate local state, no bucket import
   terraform.tfvars          # Gitignored. Holds real values; don't commit it
 deploy.sh                   # Uploads sites/root to S3 (with Cache-Control), deletes extras, invalidates CloudFront
 cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared style.tex, build.sh
-tools/                      # build-bootstrap.sh (CSS subset) and build-icons.py (icon sprite)
+tools/                      # Asset builders and offline cache-buster checker/tests
+.github/workflows/ci.yml     # PR/main checks; no cloud credentials, actions pinned by SHA
 ```
 
 ## How the pieces connect
@@ -167,10 +171,13 @@ tools/                      # build-bootstrap.sh (CSS subset) and build-icons.py
 ```bash
 terraform -chdir=infra fmt -check -recursive
 terraform -chdir=infra validate
+terraform -chdir=infra/bootstrap validate
 python3 -m py_compile functions/send_email/lambda_function.py
 python3 -m unittest discover -s functions/send_email
 node --check sites/root/assets/js/script.js
 ./deploy.sh root --dryrun   # deploy checks + list of changed files (read-only)
+./deploy.sh root --check-only # offline cache-buster checks, no credentials
+python3 -m unittest discover -s tools -p 'test_*.py'
 python3 -m http.server 8000 --directory sites/root   # preview at http://localhost:8000 and /es/
 ```
 
@@ -190,6 +197,11 @@ and `grecaptcha` in a headless browser.
   reCAPTCHA). Run `plan` and show the output first.
 - Terraform state and the Lambda env contain the GCP API key. Don't print
   `terraform show`, `terraform state pull`, or Lambda configuration in output.
+- The bootstrap state-bucket lifecycle permanently deletes eligible historical state versions;
+  show its separate plan and obtain approval before applying. Never expire current state or
+  remove `prevent_destroy` without explicit authorization. Keep bootstrap local state backed up.
+- When enabling another AWS region, extend `signin-regions.tf` and the trust-policy region list
+  in `signin.tf` so regional break-glass sign-ins still generate email alerts.
 
 ## Git
 

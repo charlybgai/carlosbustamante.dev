@@ -3,6 +3,7 @@
 #
 #   ./deploy.sh root            deploy to production
 #   ./deploy.sh root --dryrun   run the checks and show what would change; change nothing
+#   ./deploy.sh root --check-only  offline cache-buster checks (no AWS or git access)
 #
 # A real deploy refuses to run unless:
 #   - the current branch is main and matches origin/main (what's live is also on GitHub)
@@ -42,11 +43,12 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 usage() {
-    echo "Usage: ./deploy.sh root [--dryrun]"
+    echo "Usage: ./deploy.sh root [--dryrun|--check-only]"
     exit 1
 }
 
 DRYRUN=0
+CHECK_ONLY=0
 case "${1:-}" in
     root | all) ;; # "all" kept for backwards compatibility: there is only one site
     *) usage ;;
@@ -54,8 +56,10 @@ esac
 case "${2:-}" in
     "") ;;
     --dryrun) DRYRUN=1 ;;
+    --check-only) CHECK_ONLY=1 ;;
     *) usage ;;
 esac
+[[ $# -le 2 ]] || usage
 
 # Run from the repo root no matter where the script is called from
 cd "$(dirname "${BASH_SOURCE[0]}")"
@@ -97,6 +101,10 @@ check_git() {
 
 check_cache_busters() {
     echo "   -> Checking cache-busters..."
+    if ! python3 tools/check_cache_busters.py; then
+        problem "Offline cache-buster checks failed"
+    fi
+    [[ $CHECK_ONLY -eq 1 ]] && return 0
     local pages=("$DIR/index.html" "$DIR/es/index.html" "$DIR/404.html")
     local asset tokens deployed_html deployed_token
     # The deployed index.html tells which ?v= tags are live (missing on a first deploy)
@@ -172,6 +180,12 @@ upload_group() {
     aws s3 cp "$DIR" "$BUCKET" --recursive --only-show-errors \
         --exclude "*" "$@" "${EXCLUDES[@]}" --cache-control "$cache_control"
 }
+
+if [[ $CHECK_ONLY -eq 1 ]]; then
+    check_cache_busters
+    [[ $PROBLEMS -eq 0 ]]
+    exit $?
+fi
 
 echo -e "${BLUE}🚀 Deploying the portfolio$([[ $DRYRUN -eq 1 ]] && echo ' (dry run)')...${NC}"
 CALLER_ARN=$(aws sts get-caller-identity --query Arn --output text) ||

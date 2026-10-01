@@ -78,6 +78,66 @@ terraform plan
 terraform apply
 ```
 
+### CI checks
+
+Every pull request and push to `main` runs Terraform formatting/validation, Lambda unit tests,
+JavaScript syntax and HTML validation, SCSS compilation comparison, ShellCheck, and offline
+cache-buster checks. Jobs use pinned actions, read-only repository permissions, and no cloud
+credentials. Standard GitHub runners are free for this public repository.
+
+```bash
+./deploy.sh root --check-only   # offline; checks EN, ES and 404 asset tags
+python3 -m unittest discover -s tools -p 'test_*.py'
+```
+
+The offline check verifies tag consistency and missing tags. The deployment dry run also
+compares assets with S3 to detect a changed file whose tag was not bumped.
+
+### Account security baseline
+
+`infra/security.tf` defines a free external-access IAM Access Analyzer and one multi-region
+CloudTrail trail with management events, log validation, and 90-day retention in a private
+SSE-S3 bucket. CloudTrail's first management-event copy is free; S3 storage and requests are
+billed by usage. Paid data-event analysis, Insights and CloudWatch log delivery are disabled.
+Review Access Analyzer findings before archiving any of them.
+
+`infra/signin.tf` sends recognized root and `Charly` console sign-in attempts to the existing
+`contact-form-alerts` email subscription. Regional EventBridge rules forward matching events
+to `us-east-1`; IAM roles allow only that event bus and SNS topic. `infra/signin-regions.tf`
+covers all 17 regions enabled during setup. When enabling another region, add its provider,
+forwarding module, and trust-policy ARN list entry. CloudTrail still records activity in all
+enabled regions. Failed sign-ins that AWS reports with a hidden identity cannot be matched
+to a specific user. EventBridge cross-region delivery and SNS requests incur usage charges;
+these should be negligible for occasional sign-ins.
+
+These resources become active after the reviewed Terraform plan is applied. Verify trail
+logging and delivery, validate its first log files, review analyzer findings, and test a
+`Charly` sign-in to confirm the notification arrives. Do not sign in as root just to test.
+
+### Terraform state bucket protections
+
+`infra/bootstrap/` is a separate configuration with local state. It manages only the existing
+state bucket's TLS-only policy and lifecycle, without importing the bucket or the site's
+state. Keep its local state in a secure backup; it is gitignored and must not be committed.
+
+```bash
+export AWS_PROFILE=portfolio-admin
+terraform -chdir=infra/bootstrap init
+terraform -chdir=infra/bootstrap plan
+# After reviewing and approving the plan:
+terraform -chdir=infra/bootstrap apply
+terraform -chdir=infra plan   # immediately verify state access still works
+```
+
+The lifecycle keeps the newest 10 noncurrent versions per object under `portfolio/`, expires
+older noncurrent versions after 90 days, removes expired delete markers, and aborts incomplete
+uploads after 7 days. Current state is never expired. Removing historical versions is permanent
+once S3 executes the lifecycle. TLS-only access and shorter retention add no recurring fees.
+`prevent_destroy` guards both settings and the audit bucket against accidental Terraform removal.
+For emergency recovery from an incorrect bucket policy, an administrator can delete the policy
+with `aws s3api delete-bucket-policy --bucket carlosbustamante-ops-terraform-state`, then correct
+and reapply it from the bootstrap configuration.
+
 ## Acknowledgements
 
 The original layout of the portfolio was based on the course offered by **Cheetah Academy** on Udemy:

@@ -21,6 +21,7 @@ terraform.rc
 
 functions/send_email/lambda_function.zip
 functions/send_email/__pycache__/
+tools/__pycache__/
 
 # Local working notes (not part of the repo)
 docs/site-overhaul-plan.md
