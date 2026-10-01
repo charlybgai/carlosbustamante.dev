@@ -54,27 +54,14 @@ resource "aws_s3_bucket_website_configuration" "www" {
   }
 }
 
+# The bucket holds no objects: its website endpoint only answers every request with a 301 to
+# the apex domain (redirect_all_requests_to), which works without public read access. So it
+# stays fully private like the content bucket.
 resource "aws_s3_bucket_public_access_block" "www" {
   bucket = aws_s3_bucket.www.id
 
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
-resource "aws_s3_bucket_policy" "www" {
-  bucket = aws_s3_bucket.www.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Sid       = "AllowPublicRead"
-      Effect    = "Allow"
-      Principal = "*"
-      Action    = "s3:GetObject"
-      Resource  = "${aws_s3_bucket.www.arn}/*"
-    }]
-  })
-
-  depends_on = [aws_s3_bucket_public_access_block.www]
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }

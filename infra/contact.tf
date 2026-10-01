@@ -29,6 +29,9 @@ resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
 data "aws_caller_identity" "current" {}
 
 locals {
+  # The only origin the contact API answers (Lambda headers, OPTIONS and gateway responses)
+  allowed_origin = "https://${var.root_domain}"
+
   # SES checks SendEmail against the verified identity of the sender. In the SES sandbox the
   # recipient must be a verified identity as well, so both addresses' domains are allowed.
   ses_identity_arns = distinct([
@@ -75,7 +78,7 @@ resource "aws_lambda_function" "send_email" {
 
   environment {
     variables = {
-      ALLOWED_ORIGIN     = "https://${var.root_domain}"
+      ALLOWED_ORIGIN     = local.allowed_origin
       CONTACT_SENDER     = var.contact_sender_email
       CONTACT_RECIPIENT  = var.contact_recipient_email
       GCP_API_KEY        = google_apikeys_key.recaptcha_assessment.key_string
@@ -167,12 +170,26 @@ resource "aws_api_gateway_integration_response" "sendemail_options" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type'"
     "method.response.header.Access-Control-Allow-Methods" = "'OPTIONS,POST'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'https://carlosbustamante.dev'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${local.allowed_origin}'"
   }
 
   depends_on = [
     aws_api_gateway_integration.sendemail_options
   ]
+}
+
+# Errors that API Gateway produces itself (throttling = 429, Lambda crash or timeout = 502/504,
+# unknown path = 403) don't come from the Lambda, so they had no CORS header and the browser
+# couldn't read them. Customizing the two defaults covers every 4XX/5XX type that isn't
+# customized on its own, THROTTLED included.
+resource "aws_api_gateway_gateway_response" "cors" {
+  for_each      = toset(["DEFAULT_4XX", "DEFAULT_5XX"])
+  rest_api_id   = aws_api_gateway_rest_api.send_email.id
+  response_type = each.key
+
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin" = "'${local.allowed_origin}'"
+  }
 }
 
 # A deployment is a snapshot of the API. `triggers` hashes every resource that defines the API,
@@ -191,6 +208,7 @@ resource "aws_api_gateway_deployment" "send_email" {
       aws_api_gateway_method_response.sendemail_options,
       aws_api_gateway_integration.sendemail_options,
       aws_api_gateway_integration_response.sendemail_options,
+      aws_api_gateway_gateway_response.cors,
     ]))
   }
 

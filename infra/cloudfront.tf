@@ -149,8 +149,9 @@ resource "aws_cloudfront_distribution" "www" {
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "S3-www-redirect"
 
+    # Forward the query string so the S3 redirect keeps it (e.g. UTM tags on www links)
     forwarded_values {
-      query_string = false
+      query_string = true
       cookies { forward = "none" }
     }
 

@@ -1,11 +1,13 @@
 import json
 import os
 import re
+import traceback
 import urllib.error
+import urllib.parse
 import urllib.request
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import BotoCoreError, ClientError
 
 
 ALLOWED_ORIGIN = os.environ["ALLOWED_ORIGIN"]
@@ -15,11 +17,14 @@ GCP_API_KEY = os.environ["GCP_API_KEY"]
 GCP_PROJECT_ID = os.environ["GCP_PROJECT_ID"]
 RECAPTCHA_SITE_KEY = os.environ["RECAPTCHA_SITE_KEY"]
 RECAPTCHA_MIN_SCORE = float(os.environ.get("RECAPTCHA_MIN_SCORE", "0.5"))
+# Tokens must come from the production page (the site key also allows localhost for testing)
+RECAPTCHA_HOSTNAME = urllib.parse.urlparse(ALLOWED_ORIGIN).hostname
 
 # Same limits as the maxlength attributes on the contact form (sites/root/index.html)
 MAX_LENGTHS = {"name": 100, "email": 254, "subject": 150, "message": 5000}
-# reCAPTCHA tokens are about 2 KB; anything far larger isn't a real token
-MAX_TOKEN_LENGTH = 4096
+# reCAPTCHA tokens are about 2.3 KB of base64url text. Junk that doesn't look like a token is
+# rejected here, because Google bills every assessment, including ones for malformed tokens.
+TOKEN_RE = re.compile(r"^[A-Za-z0-9_.-]{100,4096}$")
 # API Gateway rejects nothing by size here, so cap the raw body before parsing it
 MAX_BODY_BYTES = 16 * 1024
 
@@ -28,6 +33,10 @@ MAX_BODY_BYTES = 16 * 1024
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 # Characters that could split an email header (Subject / Reply-To)
 HEADER_BREAKS = re.compile(r"[\r\n\x00]")
+
+
+class UpstreamError(Exception):
+    """A dependency (reCAPTCHA or SES) failed. The request itself may have been fine."""
 
 
 def response(status_code, body):
@@ -59,7 +68,7 @@ def validate_input(body):
         fields[name] = value
 
     token = body.get("g-recaptcha-response", "")
-    if not isinstance(token, str) or not token.strip() or len(token) > MAX_TOKEN_LENGTH:
+    if not isinstance(token, str) or not TOKEN_RE.match(token.strip()):
         return None, "Invalid input data."
     fields["token"] = token.strip()
 
@@ -75,6 +84,8 @@ def validate_input(body):
 
 
 def verify_recaptcha(token, action):
+    """Return (is_human, score). Raise UpstreamError if Google can't be reached or answers
+    with an error (bad API key, quota exhausted, outage), so it isn't reported as a bad token."""
     url = (
         "https://recaptchaenterprise.googleapis.com/v1/"
         f"projects/{GCP_PROJECT_ID}/assessments?key={GCP_API_KEY}"
@@ -97,12 +108,11 @@ def verify_recaptcha(token, action):
         with urllib.request.urlopen(request, timeout=5) as result:
             assessment = json.loads(result.read().decode("utf-8"))
     except urllib.error.HTTPError as error:
-        error_body = error.read().decode("utf-8", errors="replace")
-        print(f"reCAPTCHA API HTTP {error.code}: {error_body}")
-        return False, 0.0
-    except urllib.error.URLError as error:
-        print(f"reCAPTCHA API error: {error}")
-        return False, 0.0
+        error_body = error.read().decode("utf-8", errors="replace")[:500]
+        raise UpstreamError(f"reCAPTCHA API HTTP {error.code}: {error_body}") from error
+    # URLError and timeouts are OSError subclasses; ValueError covers a non-JSON reply
+    except (OSError, ValueError) as error:
+        raise UpstreamError(f"reCAPTCHA API error: {error!r}") from error
 
     token_properties = assessment.get("tokenProperties", {})
     if not token_properties.get("valid", False):
@@ -113,11 +123,28 @@ def verify_recaptcha(token, action):
         print(f"Action mismatch: expected {action}, got {token_properties.get('action')}")
         return False, 0.0
 
+    if token_properties.get("hostname") != RECAPTCHA_HOSTNAME:
+        print(f"Hostname mismatch: expected {RECAPTCHA_HOSTNAME}, got {token_properties.get('hostname')}")
+        return False, 0.0
+
     score = assessment.get("riskAnalysis", {}).get("score", 0.0)
     return score >= RECAPTCHA_MIN_SCORE, score
 
 
 def lambda_handler(event, context):
+    # Every response, including unexpected failures, goes through response() so the browser
+    # always gets CORS headers and can show the right message.
+    try:
+        return handle(event)
+    except UpstreamError as error:
+        print(f"UPSTREAM_ERROR {error}")
+        return response(503, {"message": "The contact service is temporarily unavailable."})
+    except Exception:  # noqa: BLE001 - last-resort guard, logged with a traceback
+        print(f"UNHANDLED_ERROR {traceback.format_exc()}")
+        return response(500, {"message": "Unexpected error."})
+
+
+def handle(event):
     if event.get("httpMethod") == "OPTIONS":
         return response(200, {"message": "OK"})
 
@@ -161,7 +188,8 @@ def lambda_handler(event, context):
             },
         )
     except ClientError as error:
-        print(f"SES error: {error.response['Error'].get('Code', 'UNKNOWN')}")
-        return response(500, {"message": "Error sending email."})
+        raise UpstreamError(f"SES error: {error.response['Error'].get('Code', 'UNKNOWN')}") from error
+    except BotoCoreError as error:
+        raise UpstreamError(f"SES error: {error!r}") from error
 
     return response(200, {"message": "Email sent successfully."})
