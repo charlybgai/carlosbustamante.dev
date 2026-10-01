@@ -42,15 +42,11 @@
     <link rel="icon" href="assets/images/favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="assets/images/favicon.png">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&family=Montserrat:wght@700;800&display=swap">
-    <link rel="stylesheet"
-        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="assets/css/main.css?v=20260929-fallbacks">
+    <link rel="preload" href="assets/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/fira-code-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/css/bootstrap.css?v=5.3.3-subset1">
+    <link rel="stylesheet" href="assets/css/main.css?v=20260930-selfhosted">
     <script>document.documentElement.classList.add('js');</script>
 
     <script type="application/ld+json">
@@ -160,27 +156,27 @@
             <ul>
                 <li>
                     <a href="#home" class="active" aria-current="page">
-                        <i class="las la-home" aria-hidden="true"></i><span class="nav-label">Home</span>
+                        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#home"></use></svg><span class="nav-label">Home</span>
                     </a>
                 </li>
                 <li>
                     <a href="#about_me">
-                        <i class="las la-user" aria-hidden="true"></i><span class="nav-label">About me</span>
+                        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#user"></use></svg><span class="nav-label">About me</span>
                     </a>
                 </li>
                 <li>
                     <a href="#my_resume">
-                        <i class="las la-briefcase" aria-hidden="true"></i><span class="nav-label">Background</span>
+                        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#briefcase"></use></svg><span class="nav-label">Background</span>
                     </a>
                 </li>
                 <li>
                     <a href="#my_work">
-                        <i class="las la-layer-group" aria-hidden="true"></i><span class="nav-label">Portfolio</span>
+                        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#layer-group"></use></svg><span class="nav-label">Portfolio</span>
                     </a>
                 </li>
                 <li>
                     <a href="#contact_me">
-                        <i class="las la-paper-plane" aria-hidden="true"></i><span class="nav-label">Contact</span>
+                        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#paper-plane"></use></svg><span class="nav-label">Contact</span>
                     </a>
                 </li>
             </ul>
@@ -219,31 +215,31 @@
                         </ul>
                         <div class="cta">
                             <a class="btn-custom-blue" href="assets/files/CV.pdf" download>
-                                <i class="las la-download" aria-hidden="true"></i>Download CV
+                                <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#download"></use></svg>Download CV
                             </a>
                             <a class="btn-custom-dark" href="#my_work">
-                                View projects<i class="las la-arrow-right" aria-hidden="true"></i>
+                                View projects<svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg>
                             </a>
                         </div>
                         <ul class="socials" aria-label="Profiles">
                             <li>
                                 <a href="https://www.linkedin.com/in/charlybgai" target="_blank" rel="noopener noreferrer">
-                                    <i class="lab la-linkedin-in" aria-hidden="true"></i><span class="visually-hidden">LinkedIn</span>
+                                    <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#linkedin-in"></use></svg><span class="visually-hidden">LinkedIn</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="https://github.com/charlybgai" target="_blank" rel="noopener noreferrer">
-                                    <i class="lab la-github" aria-hidden="true"></i><span class="visually-hidden">GitHub</span>
+                                    <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#github"></use></svg><span class="visually-hidden">GitHub</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="https://www.kaggle.com/charlybgai" target="_blank" rel="noopener noreferrer">
-                                    <i class="lab la-kaggle" aria-hidden="true"></i><span class="visually-hidden">Kaggle</span>
+                                    <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#kaggle"></use></svg><span class="visually-hidden">Kaggle</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="https://x.com/charlybgai" target="_blank" rel="noopener noreferrer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                                    <svg class="x-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
                                         <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932L18.901 1.153zM17.61 20.644h2.039L6.486 3.24H4.298l13.312 17.403z" />
                                     </svg><span class="visually-hidden">X (Twitter)</span>
                                 </a>
@@ -320,10 +316,10 @@
                         </dl>
                         <div class="buttons">
                             <a class="btn-custom-blue" href="assets/files/CV.pdf" download>
-                                <i class="las la-download" aria-hidden="true"></i>Download CV
+                                <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#download"></use></svg>Download CV
                             </a>
                             <a class="btn-custom-dark" href="#contact_me">
-                                Message me<i class="las la-arrow-right" aria-hidden="true"></i>
+                                Message me<svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg>
                             </a>
                         </div>
                     </div>
@@ -331,12 +327,12 @@
 
                 <div class="row g-4 skills-block">
                     <div class="col-12">
-                        <h3 class="sub-head"><i class="las la-layer-group" aria-hidden="true"></i>Technical skills</h3>
+                        <h3 class="sub-head"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#layer-group"></use></svg>Technical skills</h3>
                         <div class="row g-3">
                             <div class="col-md-6 col-xl-3">
                                 <article class="skill-card">
                                     <div class="skill-head">
-                                        <i class="las la-cloud" aria-hidden="true"></i>
+                                        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#cloud"></use></svg>
                                         <h4>Cloud &amp; Infrastructure</h4>
                                     </div>
                                     <ul class="chip-list">
@@ -356,7 +352,7 @@
                             <div class="col-md-6 col-xl-3">
                                 <article class="skill-card">
                                     <div class="skill-head">
-                                        <i class="las la-cogs" aria-hidden="true"></i>
+                                        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#cogs"></use></svg>
                                         <h4>DevOps &amp; IaC</h4>
                                     </div>
                                     <ul class="chip-list">
@@ -372,7 +368,7 @@
                             <div class="col-md-6 col-xl-3">
                                 <article class="skill-card">
                                     <div class="skill-head">
-                                        <i class="las la-brain" aria-hidden="true"></i>
+                                        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#brain"></use></svg>
                                         <h4>AI/ML &amp; MLOps</h4>
                                     </div>
                                     <ul class="chip-list">
@@ -391,7 +387,7 @@
                             <div class="col-md-6 col-xl-3">
                                 <article class="skill-card">
                                     <div class="skill-head">
-                                        <i class="las la-code" aria-hidden="true"></i>
+                                        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#code"></use></svg>
                                         <h4>Programming &amp; Data</h4>
                                     </div>
                                     <ul class="chip-list">
@@ -412,7 +408,7 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <h3 class="sub-head"><i class="las la-language" aria-hidden="true"></i>Languages</h3>
+                        <h3 class="sub-head"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#language"></use></svg>Languages</h3>
                         <ul class="languages-card">
                             <li>
                                 <span class="lang">Spanish</span>
@@ -437,7 +433,7 @@
                 </div>
 
                 <div class="certifications">
-                    <h3 class="sub-head"><i class="las la-certificate" aria-hidden="true"></i>Certifications</h3>
+                    <h3 class="sub-head"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#certificate"></use></svg>Certifications</h3>
                     <p class="certs-intro">Each card links to the official verification page.</p>
                     <div class="row g-4 justify-content-center">
                         <div class="col-sm-6 col-lg-4">
@@ -446,7 +442,7 @@
                                 <div class="body">
                                     <p class="issuer">Amazon Web Services</p>
                                     <h4>AWS Certified Generative AI Developer – Professional</h4>
-                                    <p class="meta"><span>Valid through 2029</span><span class="verify">Verify<i class="las la-external-link-alt" aria-hidden="true"></i><span class="visually-hidden"> (opens in a new tab)</span></span></p>
+                                    <p class="meta"><span>Valid through 2029</span><span class="verify">Verify<svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#external-link-alt"></use></svg><span class="visually-hidden"> (opens in a new tab)</span></span></p>
                                 </div>
                             </a>
                         </div>
@@ -456,7 +452,7 @@
                                 <div class="body">
                                     <p class="issuer">Amazon Web Services</p>
                                     <h4>AWS Certified Machine Learning Engineer – Associate</h4>
-                                    <p class="meta"><span>Valid through 2029</span><span class="verify">Verify<i class="las la-external-link-alt" aria-hidden="true"></i><span class="visually-hidden"> (opens in a new tab)</span></span></p>
+                                    <p class="meta"><span>Valid through 2029</span><span class="verify">Verify<svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#external-link-alt"></use></svg><span class="visually-hidden"> (opens in a new tab)</span></span></p>
                                 </div>
                             </a>
                         </div>
@@ -466,7 +462,7 @@
                                 <div class="body">
                                     <p class="issuer">Amazon Web Services</p>
                                     <h4>AWS Certified Solutions Architect – Associate</h4>
-                                    <p class="meta"><span>Valid through 2027</span><span class="verify">Verify<i class="las la-external-link-alt" aria-hidden="true"></i><span class="visually-hidden"> (opens in a new tab)</span></span></p>
+                                    <p class="meta"><span>Valid through 2027</span><span class="verify">Verify<svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#external-link-alt"></use></svg><span class="visually-hidden"> (opens in a new tab)</span></span></p>
                                 </div>
                             </a>
                         </div>
@@ -476,7 +472,7 @@
                                 <div class="body">
                                     <p class="issuer">HashiCorp</p>
                                     <h4>HashiCorp Certified: Terraform Associate (004)</h4>
-                                    <p class="meta"><span>Valid through 2028</span><span class="verify">Verify<i class="las la-external-link-alt" aria-hidden="true"></i><span class="visually-hidden"> (opens in a new tab)</span></span></p>
+                                    <p class="meta"><span>Valid through 2028</span><span class="verify">Verify<svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#external-link-alt"></use></svg><span class="visually-hidden"> (opens in a new tab)</span></span></p>
                                 </div>
                             </a>
                         </div>
@@ -486,7 +482,7 @@
                                 <div class="body">
                                     <p class="issuer">Microsoft</p>
                                     <h4>Microsoft Certified: Azure Data Scientist Associate</h4>
-                                    <p class="meta"><span>Valid through 2027</span><span class="verify">Verify<i class="las la-external-link-alt" aria-hidden="true"></i><span class="visually-hidden"> (opens in a new tab)</span></span></p>
+                                    <p class="meta"><span>Valid through 2027</span><span class="verify">Verify<svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#external-link-alt"></use></svg><span class="visually-hidden"> (opens in a new tab)</span></span></p>
                                 </div>
                             </a>
                         </div>
@@ -496,7 +492,7 @@
                                 <div class="body">
                                     <p class="issuer">PMI</p>
                                     <h4>Certified Associate in Project Management (CAPM)</h4>
-                                    <p class="meta"><span>Valid through 2027</span><span class="verify">Verify<i class="las la-external-link-alt" aria-hidden="true"></i><span class="visually-hidden"> (opens in a new tab)</span></span></p>
+                                    <p class="meta"><span>Valid through 2027</span><span class="verify">Verify<svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#external-link-alt"></use></svg><span class="visually-hidden"> (opens in a new tab)</span></span></p>
                                 </div>
                             </a>
                         </div>
@@ -515,7 +511,7 @@
                 </header>
                 <div class="row g-5">
                     <div class="col-lg-7">
-                        <h3 class="sub-head"><i class="las la-briefcase" aria-hidden="true"></i>Experience</h3>
+                        <h3 class="sub-head"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#briefcase"></use></svg>Experience</h3>
                         <ol class="timeline">
                             <li class="is-current">
                                 <article class="t-card">
@@ -611,7 +607,7 @@
                     </div>
                     <div class="col-lg-5">
                         <div class="edu-col">
-                            <h3 class="sub-head"><i class="las la-graduation-cap" aria-hidden="true"></i>Education</h3>
+                            <h3 class="sub-head"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#graduation-cap"></use></svg>Education</h3>
                             <ol class="timeline">
                                 <li>
                                     <article class="t-card">
@@ -689,7 +685,7 @@
                                     <li class="chip">CloudFront</li>
                                     <li class="chip">Lambda</li>
                                 </ul>
-                                <p class="foot"><span>Ongoing</span><i class="las la-arrow-right" aria-hidden="true"></i></p>
+                                <p class="foot"><span>Ongoing</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -716,7 +712,7 @@
                                     <li class="chip">XGBoost</li>
                                     <li class="chip">Optuna</li>
                                 </ul>
-                                <p class="foot"><span>Oct 2024</span><i class="las la-arrow-right" aria-hidden="true"></i></p>
+                                <p class="foot"><span>Oct 2024</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -742,7 +738,7 @@
                                     <li class="chip">OpenCV</li>
                                     <li class="chip">TensorFlow</li>
                                 </ul>
-                                <p class="foot"><span>Jun 2024</span><i class="las la-arrow-right" aria-hidden="true"></i></p>
+                                <p class="foot"><span>Jun 2024</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -768,7 +764,7 @@
                                     <li class="chip">TensorFlow</li>
                                     <li class="chip">Arduino</li>
                                 </ul>
-                                <p class="foot"><span>Dec 2023</span><i class="las la-arrow-right" aria-hidden="true"></i></p>
+                                <p class="foot"><span>Dec 2023</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -794,7 +790,7 @@
                                     <li class="chip">XGBoost</li>
                                     <li class="chip">LASSO</li>
                                 </ul>
-                                <p class="foot"><span>Dec 2023</span><i class="las la-arrow-right" aria-hidden="true"></i></p>
+                                <p class="foot"><span>Dec 2023</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -820,7 +816,7 @@
                                     <li class="chip">Data analysis</li>
                                     <li class="chip">ML</li>
                                 </ul>
-                                <p class="foot"><span>Sep 2022</span><i class="las la-arrow-right" aria-hidden="true"></i></p>
+                                <p class="foot"><span>Sep 2022</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -845,7 +841,7 @@
                                     <li class="chip">OpenCV</li>
                                     <li class="chip">QR codes</li>
                                 </ul>
-                                <p class="foot"><span>Sep 2022</span><i class="las la-arrow-right" aria-hidden="true"></i></p>
+                                <p class="foot"><span>Sep 2022</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -871,7 +867,7 @@
                                     <li class="chip">Optuna</li>
                                     <li class="chip">Scikit-learn</li>
                                 </ul>
-                                <p class="foot"><span>Aug 2022</span><i class="las la-arrow-right" aria-hidden="true"></i></p>
+                                <p class="foot"><span>Aug 2022</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -897,7 +893,7 @@
                                     <li class="chip">Flask</li>
                                     <li class="chip">Python</li>
                                 </ul>
-                                <p class="foot"><span>Dec 2021</span><i class="las la-arrow-right" aria-hidden="true"></i></p>
+                                <p class="foot"><span>Dec 2021</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -943,7 +939,7 @@
                                         <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and
                                         <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a> apply.</p>
                                     <button type="submit" class="btn-custom-blue">
-                                        <span class="spinner" aria-hidden="true"></span>Send message<i class="las la-paper-plane" aria-hidden="true"></i>
+                                        <span class="spinner" aria-hidden="true"></span>Send message<svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#paper-plane"></use></svg>
                                     </button>
                                 </div>
                                 <p class="form-status" role="status" aria-live="polite"></p>
@@ -953,23 +949,23 @@
                     <div class="col-lg-5">
                         <div class="contact-info">
                             <a class="info-item" href="mailto:me@carlosbustamante.dev">
-                                <span class="icon"><i class="las la-envelope" aria-hidden="true"></i></span>
+                                <span class="icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#envelope"></use></svg></span>
                                 <span><span class="label">Email</span><span class="value">me@carlosbustamante.dev</span></span>
                             </a>
                             <a class="info-item" href="tel:+525531311250">
-                                <span class="icon"><i class="las la-phone" aria-hidden="true"></i></span>
+                                <span class="icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#phone"></use></svg></span>
                                 <span><span class="label">Phone</span><span class="value">+52&nbsp;55&nbsp;3131&nbsp;1250</span></span>
                             </a>
                             <a class="info-item" href="https://www.linkedin.com/in/charlybgai" target="_blank" rel="noopener noreferrer">
-                                <span class="icon"><i class="lab la-linkedin-in" aria-hidden="true"></i></span>
+                                <span class="icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#linkedin-in"></use></svg></span>
                                 <span><span class="label">LinkedIn</span><span class="value">linkedin.com/in/charlybgai</span></span>
                             </a>
                             <a class="info-item" href="assets/files/CV.pdf" download>
-                                <span class="icon"><i class="las la-file-alt" aria-hidden="true"></i></span>
+                                <span class="icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#file-alt"></use></svg></span>
                                 <span><span class="label">Resume</span><span class="value">Download CV (PDF)</span></span>
                             </a>
                             <div class="info-item">
-                                <span class="icon"><i class="las la-map-marker-alt" aria-hidden="true"></i></span>
+                                <span class="icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#map-marker-alt"></use></svg></span>
                                 <span><span class="label">Location</span><span class="value">Estado de México, México</span></span>
                             </div>
                         </div>
@@ -991,7 +987,7 @@
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <button type="button" class="modal-close-button" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="las la-times" aria-hidden="true"></i>
+                    <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#times"></use></svg>
                 </button>
                 <div class="modal-media">
                     <img src="assets/images/works/portfolio-site.webp" alt="" width="1200" height="750" loading="lazy">
@@ -1007,20 +1003,20 @@
                             <div class="meta">
                                 <dl>
                                     <div>
-                                        <dt><i class="las la-layer-group" aria-hidden="true"></i>Type</dt>
+                                        <dt><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#layer-group"></use></svg>Type</dt>
                                         <dd class="type-value"></dd>
                                     </div>
                                     <div>
-                                        <dt><i class="las la-calendar-check" aria-hidden="true"></i>Completed</dt>
+                                        <dt><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#calendar-check"></use></svg>Completed</dt>
                                         <dd class="completed-value"></dd>
                                     </div>
                                     <div>
-                                        <dt><i class="las la-tools" aria-hidden="true"></i>Tools</dt>
+                                        <dt><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#tools"></use></svg>Tools</dt>
                                         <dd><ul class="chip-list tools-value"></ul></dd>
                                     </div>
                                 </dl>
                                 <a class="btn-custom-blue project-link" href="#" target="_blank" rel="noopener noreferrer">
-                                    <span class="label">View project</span><i class="las la-external-link-alt" aria-hidden="true"></i>
+                                    <span class="label">View project</span><svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#external-link-alt"></use></svg>
                                 </a>
                             </div>
                         </div>
@@ -1031,7 +1027,7 @@
     </div>
 
     <button id="scrollTop" class="scroll-top" type="button" aria-label="Back to top">
-        <i class="las la-arrow-up" aria-hidden="true"></i>
+        <svg class="ico" aria-hidden="true" focusable="false"><use href="assets/images/icons.svg?v=20260930#arrow-up"></use></svg>
     </button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" async

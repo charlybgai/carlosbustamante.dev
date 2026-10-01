@@ -2,6 +2,17 @@
 @use "fonts" as *;
 @use "mixins" as *;
 
+// Icons: SVG symbols from assets/images/icons.svg (Line Awesome glyphs, see tools/build-icons.py).
+// 1em square and baseline offset match how the icon font rendered at line-height 1.
+.ico {
+    display: inline-block;
+    flex: none;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    fill: currentColor;
+}
+
 // Visually hidden but still read by screen readers. Bootstrap ships the same class; this
 // copy keeps the text hidden if Bootstrap's CSS (loaded from a CDN) fails to load.
 .visually-hidden {
@@ -130,9 +141,9 @@ main {
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
 
-    i {
-        @include icon-tile(38px);
+    .ico {
         font-size: 1.2rem;
+        @include icon-tile(38px, $on-svg: true);
     }
 }
 

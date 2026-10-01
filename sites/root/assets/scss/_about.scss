@@ -119,9 +119,9 @@
             gap: 0.85rem;
             margin-bottom: 1.1rem;
 
-            i {
-                @include icon-tile(42px);
+            .ico {
                 font-size: 1.35rem;
+                @include icon-tile(42px, $on-svg: true);
             }
 
             h4 {

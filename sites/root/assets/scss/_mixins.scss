@@ -40,8 +40,14 @@ $bp_sm: 576px;
     color: $text_muted;
 }
 
-// Square icon tile with emerald tint
-@mixin icon-tile($size: 44px) {
+// Square icon tile with emerald tint. Used on an element that wraps an icon (the icon is
+// centered inside it), or directly on an .ico svg with `$on-svg: true`, where padding keeps the
+// glyph at 1em instead of letting it stretch to the tile size.
+@mixin icon-tile($size: 44px, $on-svg: false) {
+    @if $on-svg {
+        padding: calc((#{$size} - 2px - 1em) / 2); // 2px = the 1px border on both sides
+    }
+
     flex: none;
     display: grid;
     place-items: center;
