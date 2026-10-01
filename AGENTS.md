@@ -184,7 +184,8 @@ and `grecaptcha` in a headless browser.
   that don't exist locally, and invalidates CloudFront distribution `E6VISQC42W7BR`. It skips
   `assets/scss/` and `*.map`. It only runs from a clean `main` that matches `origin/main`, so
   merge first. `./deploy.sh root --dryrun` shows the checks and the changed files without
-  touching anything (works on any branch).
+  touching anything (works on any branch). The script defaults to the `portfolio-deploy` SSO
+  profile and checks that the caller has its deploy-only role. Use `portfolio-admin` for Terraform.
 - `terraform apply` changes live resources and the shared remote state (DNS, CDN, SES, Lambda,
   reCAPTCHA). Run `plan` and show the output first.
 - Terraform state and the Lambda env contain the GCP API key. Don't print

@@ -55,14 +55,23 @@ for conventions and checks.
 
 ## Deployment
 
+Sign in with the limited portfolio deploy role. `deploy.sh` selects this profile by default and
+checks the active role before accessing production.
+
 ```bash
+aws sso login --profile portfolio-deploy
 ./deploy.sh root --dryrun   # checks + list of changed files, changes nothing
 ./deploy.sh root            # from a clean main that matches origin/main
 ```
 
 ## Infrastructure
 
+Use the administrative SSO profile for Terraform. The AWS CLI will prompt for a new browser
+sign-in when the SSO session expires.
+
 ```bash
+export AWS_PROFILE=portfolio-admin
+aws sso login --profile "$AWS_PROFILE"
 cd infra
 terraform init
 terraform plan
