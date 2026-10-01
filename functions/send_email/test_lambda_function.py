@@ -31,6 +31,14 @@ class FakeClientError(Exception):
         self.response = {"Error": {"Code": code}}
 
 
+class FakeBotoCoreError(Exception):
+    pass
+
+
+# Real tokens are ~2.3 KB of base64url text
+TOKEN = "0c" + "A1b2_C3d4-" * 230
+
+
 def load_module():
     """Import lambda_function with stand-in boto3/botocore modules."""
     fake_boto3 = types.ModuleType("boto3")
@@ -38,6 +46,7 @@ def load_module():
     fake_botocore = types.ModuleType("botocore")
     fake_exceptions = types.ModuleType("botocore.exceptions")
     fake_exceptions.ClientError = FakeClientError
+    fake_exceptions.BotoCoreError = FakeBotoCoreError
     fake_botocore.exceptions = fake_exceptions
     modules = {"boto3": fake_boto3, "botocore": fake_botocore, "botocore.exceptions": fake_exceptions}
     with mock.patch.dict(sys.modules, modules), mock.patch.dict(os.environ, ENV):
@@ -56,7 +65,7 @@ def valid_body(**overrides):
         "email": "ada@example.com",
         "subject": "Hello",
         "message": "I'd like to talk about a role.",
-        "g-recaptcha-response": "token-123",
+        "g-recaptcha-response": TOKEN,
     }
     body.update(overrides)
     return body
@@ -67,10 +76,11 @@ def event(body):
     return {"httpMethod": "POST", "body": raw}
 
 
-def recaptcha_reply(valid=True, action="submit", score=0.9):
-    payload = {"tokenProperties": {"valid": valid, "action": action}, "riskAnalysis": {"score": score}}
+def recaptcha_reply(valid=True, action="submit", score=0.9, hostname="carlosbustamante.dev", raw=None):
+    payload = {"tokenProperties": {"valid": valid, "action": action, "hostname": hostname},
+               "riskAnalysis": {"score": score}}
     reply = mock.MagicMock()
-    reply.__enter__.return_value.read.return_value = json.dumps(payload).encode()
+    reply.__enter__.return_value.read.return_value = raw if raw is not None else json.dumps(payload).encode()
     return reply
 
 
@@ -114,9 +124,13 @@ class ContactLambdaTests(unittest.TestCase):
         self.assertEqual(status, 200)
 
     def test_cors_headers_on_every_response(self):
-        for body in (valid_body(), valid_body(email="bad")):
-            result = self.lf.lambda_handler(event(body), None)
-            self.assertEqual(result["headers"]["Access-Control-Allow-Origin"], ENV["ALLOWED_ORIGIN"])
+        cases = [(valid_body(), None), (valid_body(email="bad"), None),
+                 (valid_body(), urllib.error.URLError("down")), (valid_body(), RuntimeError("bug"))]
+        for body, failure in cases:
+            with self.subTest(failure=failure):
+                self.urlopen.side_effect = failure
+                result = self.lf.lambda_handler(event(body), None)
+                self.assertEqual(result["headers"]["Access-Control-Allow-Origin"], ENV["ALLOWED_ORIGIN"])
 
     def test_options_preflight(self):
         result = self.lf.lambda_handler({"httpMethod": "OPTIONS"}, None)
@@ -166,6 +180,11 @@ class ContactLambdaTests(unittest.TestCase):
             with self.subTest(raw=raw):
                 self.assert_rejected(raw)
 
+    def test_tokens_that_dont_look_like_recaptcha_are_rejected_before_google(self):
+        for token in ("fake-token", "t", "x" * 99, TOKEN[:500] + "<script>", TOKEN[:500] + " " + TOKEN[:500]):
+            with self.subTest(token=token[:20]):
+                self.assert_rejected(valid_body(**{"g-recaptcha-response": token}))
+
     def test_invalid_json(self):
         self.assert_rejected("{not json")
 
@@ -180,25 +199,56 @@ class ContactLambdaTests(unittest.TestCase):
         self.assertIn("reCAPTCHA", body["message"])
         self.ses.send_email.assert_not_called()
 
-    def test_invalid_token_or_wrong_action_is_rejected(self):
-        for reply in (recaptcha_reply(valid=False), recaptcha_reply(action="login")):
+    def test_invalid_token_wrong_action_or_wrong_hostname_is_rejected(self):
+        for reply in (recaptcha_reply(valid=False), recaptcha_reply(action="login"),
+                      recaptcha_reply(hostname="localhost"), recaptcha_reply(hostname="evil.example.com")):
             with self.subTest(reply=reply):
                 self.urlopen.return_value = reply
                 status, _ = self.call(valid_body())
                 self.assertEqual(status, 400)
         self.ses.send_email.assert_not_called()
 
-    def test_recaptcha_api_failure_is_rejected(self):
-        self.urlopen.side_effect = urllib.error.HTTPError("url", 403, "Forbidden", {}, io.BytesIO(b"{}"))
-        status, _ = self.call(valid_body())
-        self.assertEqual(status, 400)
+    # --- dependency failures are 503 (alarmed), never mistaken for a bad request -----
+    def assert_unavailable(self):
+        status, body = self.call(valid_body())
+        self.assertEqual(status, 503)
+        self.assertIn("temporarily unavailable", body["message"])
+        return body
+
+    def test_recaptcha_http_errors_are_503(self):
+        for code in (400, 403, 429, 500, 503):
+            with self.subTest(code=code):
+                self.urlopen.side_effect = urllib.error.HTTPError("url", code, "err", {}, io.BytesIO(b"{}"))
+                self.assert_unavailable()
         self.ses.send_email.assert_not_called()
 
-    def test_ses_error_returns_500(self):
-        self.ses.send_email.side_effect = FakeClientError("MessageRejected")
+    def test_recaptcha_network_failures_are_503(self):
+        # socket.timeout is TimeoutError, which is not a URLError subclass
+        for failure in (urllib.error.URLError("no route"), TimeoutError("timed out"), ConnectionResetError()):
+            with self.subTest(failure=type(failure).__name__):
+                self.urlopen.side_effect = failure
+                self.assert_unavailable()
+        self.ses.send_email.assert_not_called()
+
+    def test_recaptcha_non_json_reply_is_503(self):
+        for raw in (b"<html>oops</html>", b"\xff\xfe"):
+            with self.subTest(raw=raw):
+                self.urlopen.return_value = recaptcha_reply(raw=raw)
+                self.assert_unavailable()
+
+    def test_ses_client_error_is_503(self):
+        self.ses.send_email.side_effect = FakeClientError("Throttling")
+        self.assert_unavailable()
+
+    def test_ses_connection_error_is_503(self):
+        self.ses.send_email.side_effect = FakeBotoCoreError("EndpointConnectionError")
+        self.assert_unavailable()
+
+    def test_unexpected_error_is_500_with_message(self):
+        self.ses.send_email.side_effect = RuntimeError("bug")
         status, body = self.call(valid_body())
         self.assertEqual(status, 500)
-        self.assertEqual(body["message"], "Error sending email.")
+        self.assertEqual(body["message"], "Unexpected error.")
 
 
 if __name__ == "__main__":

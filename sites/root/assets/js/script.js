@@ -24,6 +24,8 @@
             failed: "Something went wrong and your message wasn't sent. Please try again in a moment.",
             captcha: "The spam check didn't load, so the message can't be sent right now.",
             timeout: 'The server took too long to respond. Please try again.',
+            busy: 'Too many messages are being sent right now. Please wait a minute and try again.',
+            unavailable: 'The contact service is temporarily unavailable, so your message wasn\'t sent. Please try again later.',
             fallback: 'You can also email me at',
         },
         es: {
@@ -37,6 +39,8 @@
             failed: 'Algo salió mal y tu mensaje no se envió. Inténtalo de nuevo en un momento.',
             captcha: 'La verificación antispam no cargó, así que por ahora no se puede enviar el mensaje.',
             timeout: 'El servidor tardó demasiado en responder. Inténtalo de nuevo.',
+            busy: 'Se están enviando demasiados mensajes en este momento. Espera un minuto e inténtalo de nuevo.',
+            unavailable: 'El servicio de contacto no está disponible por ahora, así que tu mensaje no se envió. Inténtalo más tarde.',
             fallback: 'También puedes escribirme a',
         },
     }[LANG];
@@ -375,6 +379,15 @@
         });
     }
 
+    // 400/413: the request itself was refused. 429: API throttling. 503: reCAPTCHA or SES is
+    // down (the Lambda reports it separately so it isn't shown as a validation problem).
+    function statusCode(status) {
+        if (status === 429) return 'busy';
+        if (status === 503) return 'unavailable';
+        if (status >= 400 && status < 500) return 'rejected';
+        return 'failed';
+    }
+
     async function postJson(url, payload, timeoutMs) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -442,7 +455,7 @@
             try {
                 const token = await getRecaptchaToken(siteKey);
                 const response = await postJson(endpoint, { ...values, 'g-recaptcha-response': token }, 15000);
-                if (!response.ok) throw fail(response.status >= 400 && response.status < 500 ? 'rejected' : 'failed');
+                if (!response.ok) throw fail(statusCode(response.status));
                 form.reset();
                 setStatus('success', STRINGS.success);
             } catch (error) {
