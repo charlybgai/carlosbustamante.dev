@@ -46,7 +46,7 @@
     <link rel="preload" href="../assets/fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="../assets/fonts/fira-code-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="../assets/css/bootstrap.css?v=5.3.3-subset1">
-    <link rel="stylesheet" href="../assets/css/main.css?v=20260930-selfhosted">
+    <link rel="stylesheet" href="../assets/css/main.css?v=20260930-polish">
     <script>document.documentElement.classList.add('js');</script>
 
     <script type="application/ld+json">
@@ -190,6 +190,10 @@
     <main id="main" tabindex="-1">
         <!-- Inicio -->
         <section id="home" class="active" aria-labelledby="home-title" tabindex="-1">
+            <button type="button" class="motion-toggle" aria-pressed="false" hidden
+                data-pause-icon="../assets/images/icons.svg?v=20260930#pause" data-play-icon="../assets/images/icons.svg?v=20260930#play">
+                <svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#pause"></use></svg><span class="label">Pausar animaciones</span>
+            </button>
             <div class="hero-bg" aria-hidden="true">
                 <span class="orb orb--a"></span>
                 <span class="orb orb--b"></span>
@@ -215,7 +219,7 @@
                             <li class="chip">vLLM</li>
                         </ul>
                         <div class="cta">
-                            <a class="btn-custom-blue" href="../assets/files/CV_ES.pdf" download>
+                            <a class="btn-custom-blue" href="../assets/files/CV_ES.pdf" download="Carlos_Bustamante_CV_ES.pdf">
                                 <svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#download"></use></svg>Descargar CV
                             </a>
                             <a class="btn-custom-dark" href="#my_work">
@@ -226,30 +230,34 @@
                             <li>
                                 <a href="https://www.linkedin.com/in/charlybgai" target="_blank" rel="noopener noreferrer">
                                     <svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#linkedin-in"></use></svg><span class="visually-hidden">LinkedIn</span>
-                                </a>
+                                <span class="visually-hidden"> (se abre en una pestaña nueva)</span></a>
                             </li>
                             <li>
                                 <a href="https://github.com/charlybgai" target="_blank" rel="noopener noreferrer">
                                     <svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#github"></use></svg><span class="visually-hidden">GitHub</span>
-                                </a>
+                                <span class="visually-hidden"> (se abre en una pestaña nueva)</span></a>
                             </li>
                             <li>
                                 <a href="https://www.kaggle.com/charlybgai" target="_blank" rel="noopener noreferrer">
                                     <svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#kaggle"></use></svg><span class="visually-hidden">Kaggle</span>
-                                </a>
+                                <span class="visually-hidden"> (se abre en una pestaña nueva)</span></a>
                             </li>
                             <li>
                                 <a href="https://x.com/charlybgai" target="_blank" rel="noopener noreferrer">
                                     <svg class="x-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
                                         <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932L18.901 1.153zM17.61 20.644h2.039L6.486 3.24H4.298l13.312 17.403z" />
                                     </svg><span class="visually-hidden">X (Twitter)</span>
-                                </a>
+                                <span class="visually-hidden"> (se abre en una pestaña nueva)</span></a>
                             </li>
                         </ul>
                     </div>
                     <div class="col-lg-5 hero-visual">
                         <figure class="portrait">
-                            <img src="../assets/images/home-pic.webp" alt="Retrato de Carlos Bustamante" width="546" height="843" fetchpriority="high">
+                            <picture>
+                                <!-- Only screens that show the portrait (992px+) download it -->
+                                <source media="(min-width: 992px)" srcset="../assets/images/home-pic.webp" width="546" height="843">
+                                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Retrato de Carlos Bustamante" width="546" height="843" fetchpriority="high">
+                            </picture>
                         </figure>
                         <ul class="metrics" aria-label="Destacados">
                             <li class="metric metric--a">
@@ -317,7 +325,7 @@
                             </div>
                         </dl>
                         <div class="buttons">
-                            <a class="btn-custom-blue" href="../assets/files/CV_ES.pdf" download>
+                            <a class="btn-custom-blue" href="../assets/files/CV_ES.pdf" download="Carlos_Bustamante_CV_ES.pdf">
                                 <svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#download"></use></svg>Descargar CV
                             </a>
                             <a class="btn-custom-dark" href="#contact_me">
@@ -687,7 +695,7 @@
                                     <li class="chip">CloudFront</li>
                                     <li class="chip">Lambda</li>
                                 </ul>
-                                <p class="foot"><span>En curso</span><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
+                                <p class="foot"><span>En curso</span><a class="card-link" href="https://github.com/charlybgai/carlosbustamante.dev" target="_blank" rel="noopener noreferrer">Ver en GitHub<span class="visually-hidden">: carlosbustamante.dev (se abre en una pestaña nueva)</span></a><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -714,7 +722,7 @@
                                     <li class="chip">XGBoost</li>
                                     <li class="chip">Optuna</li>
                                 </ul>
-                                <p class="foot"><span>Oct 2024</span><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
+                                <p class="foot"><span>Oct 2024</span><a class="card-link" href="https://github.com/charlybgai/loan_approval" target="_blank" rel="noopener noreferrer">Ver en GitHub<span class="visually-hidden">: Predicción de aprobación de préstamos (se abre en una pestaña nueva)</span></a><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -740,7 +748,7 @@
                                     <li class="chip">OpenCV</li>
                                     <li class="chip">TensorFlow</li>
                                 </ul>
-                                <p class="foot"><span>Jun 2024</span><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
+                                <p class="foot"><span>Jun 2024</span><a class="card-link" href="https://github.com/charlybgai/PARIS" target="_blank" rel="noopener noreferrer">Ver en GitHub<span class="visually-hidden">: PARIS: asistente de aprendizaje con IA (se abre en una pestaña nueva)</span></a><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -766,7 +774,7 @@
                                     <li class="chip">TensorFlow</li>
                                     <li class="chip">Arduino</li>
                                 </ul>
-                                <p class="foot"><span>Dic 2023</span><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
+                                <p class="foot"><span>Dic 2023</span><a class="card-link" href="https://ieeexplore.ieee.org/document/10344273" target="_blank" rel="noopener noreferrer">Leer el artículo<span class="visually-hidden">: Controlador neuronal para la enseñanza de control (se abre en una pestaña nueva)</span></a><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -792,7 +800,7 @@
                                     <li class="chip">XGBoost</li>
                                     <li class="chip">LASSO</li>
                                 </ul>
-                                <p class="foot"><span>Dic 2023</span><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
+                                <p class="foot"><span>Dic 2023</span><a class="card-link" href="https://github.com/charlybgai/water_management" target="_blank" rel="noopener noreferrer">Ver en GitHub<span class="visually-hidden">: Análisis de estrés hídrico en México (se abre en una pestaña nueva)</span></a><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -818,7 +826,7 @@
                                     <li class="chip">Análisis de datos</li>
                                     <li class="chip">ML</li>
                                 </ul>
-                                <p class="foot"><span>Sep 2022</span><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
+                                <p class="foot"><span>Sep 2022</span><a class="card-link" href="https://github.com/charlybgai/ibmcertification" target="_blank" rel="noopener noreferrer">Ver en GitHub<span class="visually-hidden">: Proyecto final: IBM Data Science (se abre en una pestaña nueva)</span></a><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -869,7 +877,7 @@
                                     <li class="chip">Optuna</li>
                                     <li class="chip">Scikit-learn</li>
                                 </ul>
-                                <p class="foot"><span>Ago 2022</span><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
+                                <p class="foot"><span>Ago 2022</span><a class="card-link" href="https://github.com/charlybgai/fraud_detection" target="_blank" rel="noopener noreferrer">Ver en GitHub<span class="visually-hidden">: Detección de fraude en tarjetas de crédito (se abre en una pestaña nueva)</span></a><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -895,7 +903,7 @@
                                     <li class="chip">Flask</li>
                                     <li class="chip">Python</li>
                                 </ul>
-                                <p class="foot"><span>Dic 2021</span><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
+                                <p class="foot"><span>Dic 2021</span><a class="card-link" href="https://github.com/charlybgai/tepetl" target="_blank" rel="noopener noreferrer">Ver en GitHub<span class="visually-hidden">: Predicción de erupciones volcánicas (se abre en una pestaña nueva)</span></a><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#arrow-right"></use></svg></p>
                             </div>
                         </article>
                     </div>
@@ -914,6 +922,7 @@
                 <div class="row g-4">
                     <div class="col-lg-7">
                         <div class="contact-card">
+                            <noscript><p class="form-status is-info">El formulario necesita JavaScript. También puedes escribirme a <a href="mailto:me@carlosbustamante.dev">me@carlosbustamante.dev</a>.</p></noscript>
                             <form id="contactForm"
                                 action="https://w8e7rbc1of.execute-api.us-east-1.amazonaws.com/prod/sendemail"
                                 method="post"
@@ -938,8 +947,8 @@
                                 </div>
                                 <div class="form-actions">
                                     <p class="recaptcha-note">Este sitio está protegido por reCAPTCHA y se aplican la
-                                        <a href="https://policies.google.com/privacy?hl=es" target="_blank" rel="noopener noreferrer">Política de Privacidad</a> y los
-                                        <a href="https://policies.google.com/terms?hl=es" target="_blank" rel="noopener noreferrer">Términos del Servicio</a> de Google.</p>
+                                        <a href="https://policies.google.com/privacy?hl=es" target="_blank" rel="noopener noreferrer">Política de Privacidad<span class="visually-hidden"> (se abre en una pestaña nueva)</span></a> y los
+                                        <a href="https://policies.google.com/terms?hl=es" target="_blank" rel="noopener noreferrer">Términos del Servicio<span class="visually-hidden"> (se abre en una pestaña nueva)</span></a> de Google.</p>
                                     <button type="submit" class="btn-custom-blue">
                                         <span class="spinner" aria-hidden="true"></span>Enviar mensaje<svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#paper-plane"></use></svg>
                                     </button>
@@ -961,8 +970,8 @@
                             <a class="info-item" href="https://www.linkedin.com/in/charlybgai" target="_blank" rel="noopener noreferrer">
                                 <span class="icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#linkedin-in"></use></svg></span>
                                 <span><span class="label">LinkedIn</span><span class="value">linkedin.com/in/charlybgai</span></span>
-                            </a>
-                            <a class="info-item" href="../assets/files/CV_ES.pdf" download>
+                            <span class="visually-hidden"> (se abre en una pestaña nueva)</span></a>
+                            <a class="info-item" href="../assets/files/CV_ES.pdf" download="Carlos_Bustamante_CV_ES.pdf">
                                 <span class="icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#file-alt"></use></svg></span>
                                 <span><span class="label">Currículum</span><span class="value">Descargar CV (PDF)</span></span>
                             </a>
@@ -1019,7 +1028,7 @@
                                 </dl>
                                 <a class="btn-custom-blue project-link" href="#" target="_blank" rel="noopener noreferrer">
                                     <span class="label">Ver proyecto</span><svg class="ico" aria-hidden="true" focusable="false"><use href="../assets/images/icons.svg?v=20260930#external-link-alt"></use></svg>
-                                </a>
+                                <span class="visually-hidden"> (se abre en una pestaña nueva)</span></a>
                             </div>
                         </div>
                     </div>
@@ -1041,7 +1050,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Shuffle/6.1.0/shuffle.min.js" async
         integrity="sha512-r8mIpk3ypCMwNxH6srRZGbjHQlOFt3Mq2vrZ/iymx6g9JUqTeVavofeX6gbrxAC74X5HmBy5gxyhCm6OiXrM0Q=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="../assets/js/script.js?v=20260929-async"></script>
+    <script src="../assets/js/script.js?v=20260930-links"></script>
     <script src="https://www.google.com/recaptcha/enterprise.js?render=6LdBoB8qAAAAAHqcXpmWKGEV2CrpMJGJrHjUv1PU" async defer></script>
 </body>
 

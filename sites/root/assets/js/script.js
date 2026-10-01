@@ -25,6 +25,8 @@
             captcha: "The spam check didn't load, so the message can't be sent right now.",
             timeout: 'The server took too long to respond. Please try again.',
             busy: 'Too many messages are being sent right now. Please wait a minute and try again.',
+            pauseMotion: 'Pause animations',
+            playMotion: 'Play animations',
             unavailable: 'The contact service is temporarily unavailable, so your message wasn\'t sent. Please try again later.',
             fallback: 'You can also email me at',
         },
@@ -40,6 +42,8 @@
             captcha: 'La verificación antispam no cargó, así que por ahora no se puede enviar el mensaje.',
             timeout: 'El servidor tardó demasiado en responder. Inténtalo de nuevo.',
             busy: 'Se están enviando demasiados mensajes en este momento. Espera un minuto e inténtalo de nuevo.',
+            pauseMotion: 'Pausar animaciones',
+            playMotion: 'Reproducir animaciones',
             unavailable: 'El servicio de contacto no está disponible por ahora, así que tu mensaje no se envió. Inténtalo más tarde.',
             fallback: 'También puedes escribirme a',
         },
@@ -138,14 +142,15 @@
      * Hero role animation (skipped when the user prefers reduced motion)
      * ------------------------------------------------------------------ */
     const typedTarget = document.querySelector('#home .typed');
+    let typed = null;
+    let motionPaused = false;
     if (typedTarget && !reduceMotion.matches) {
         whenLibraryLoads(() => typeof window.Typed === 'function', 'typed.js', () => {
             // The markup holds the first role as a fallback (no JS / reduced motion / CDN down).
             // Typed.js treats existing text as an already-typed extra string, which would make
             // the first role appear all at once, so clear it before starting.
             typedTarget.textContent = '';
-            // eslint-disable-next-line no-new
-            new window.Typed(typedTarget, {
+            typed = new window.Typed(typedTarget, {
                 strings: STRINGS.roles,
                 contentType: null,
                 loop: true,
@@ -154,7 +159,32 @@
                 backDelay: 1800,
                 startDelay: 300,
             });
+            if (motionPaused) typed.stop();
         });
+    }
+
+    // Pause control for everything in the hero that moves on its own (WCAG 2.2.2): the typing
+    // loop, the drifting glow and the status pulse. Not shown when reduced motion is preferred,
+    // because nothing moves then.
+    const motionToggle = document.querySelector('#home .motion-toggle');
+    if (motionToggle && !reduceMotion.matches) {
+        const label = motionToggle.querySelector('.label');
+        const render = () => {
+            motionToggle.setAttribute('aria-pressed', String(motionPaused));
+            label.textContent = motionPaused ? STRINGS.playMotion : STRINGS.pauseMotion;
+            motionToggle.querySelector('use').setAttribute('href', motionToggle.dataset[motionPaused ? 'playIcon' : 'pauseIcon']);
+            document.getElementById('home').classList.toggle('motion-paused', motionPaused);
+        };
+        motionToggle.addEventListener('click', () => {
+            motionPaused = !motionPaused;
+            if (typed) {
+                if (motionPaused) typed.stop();
+                else typed.start();
+            }
+            render();
+        });
+        motionToggle.hidden = false;
+        render();
     }
 
     /* ------------------------------------------------------------------ *
@@ -258,7 +288,12 @@
 
     function openProject(card, trigger) {
         const modal = getModal();
-        if (!modal) return;
+        if (!modal) {
+            // Bootstrap didn't load: go straight to the project link (if the card has one)
+            const href = (card.dataset.projectLink || '').trim();
+            if (href && href !== '#') window.open(href, '_blank', 'noopener');
+            return;
+        }
         const data = card.dataset;
         const image = modalEl.querySelector('.modal-media img');
         image.src = data.image || '';
@@ -303,8 +338,8 @@
     document.querySelectorAll('#my_work .wrap').forEach((card) => {
         const trigger = card.querySelector('.card-open');
         if (!trigger) return;
-        trigger.setAttribute('aria-haspopup', 'dialog');
         trigger.addEventListener('click', () => openProject(card, trigger));
+        whenLibraryLoads(() => !!window.bootstrap, 'bootstrap', () => trigger.setAttribute('aria-haspopup', 'dialog'));
     });
 
     if (modalEl) {
