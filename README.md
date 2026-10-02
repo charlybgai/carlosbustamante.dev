@@ -29,7 +29,7 @@ carlosbustamante.dev/
 ### Infrastructure
 - **Terraform**: all infrastructure as code, remote state in S3
 - **AWS S3 + CloudFront**: private buckets behind CloudFront, compression and security headers at the edge
-- **AWS Route 53**: DNS, plus a `www` → apex redirect
+- **AWS Route 53**: IPv4/IPv6 DNS, plus a `www` → apex redirect
 - **API Gateway + Lambda + SES**: serverless contact form, with CloudWatch alarms on failures
 - **Google reCAPTCHA Enterprise**: spam protection for the form, with a daily assessment cap
 
@@ -92,6 +92,40 @@ python3 -m unittest discover -s tools -p 'test_*.py'
 
 The offline check verifies tag consistency and missing tags. The deployment dry run also
 compares assets with S3 to detect a changed file whose tag was not bumped.
+
+### CSP and certificate monitoring
+
+`infra/csp-policy.txt` is the source for the **report-only** CloudFront CSP header. It allows
+the pinned CDN library paths, Google's reCAPTCHA sources and the contact API. The frontend
+keeps inline JavaScript limited to the hashed first-paint helper; Typed.js cursor styles are
+compiled from SCSS. CI checks the hashes and exercises EN, ES and 404 in Chromium, including
+navigation, filters, modal focus, motion pause and a contact submission intercepted before AWS.
+
+```bash
+python3 tools/check_csp.py
+python3 -m pip install playwright==1.58.0
+python3 -m playwright install chromium
+python3 tools/check_csp_browser.py
+# Localhost is allowed by the real reCAPTCHA key; the API is still intercepted:
+python3 tools/check_csp_browser.py --real-recaptcha
+# After the approved production apply/deploy, verify the actual report-only header:
+python3 tools/check_csp_browser.py --live --real-recaptcha
+```
+
+Browser checks use real CDN libraries with the page's SRI checks. Google is mocked by default;
+`--real-recaptcha` loads Google's real script and requests a token but never sends an email.
+No public CSP report receiver is created. Inspect violation events locally and on production,
+then repeat after about a week before proposing enforcement in a separate PR.
+
+`infra/certificates.tf` alarms on fewer than 30 days remaining for the exact ACM certificates
+configured on CloudFront. A daily window matches ACM's twice-daily metrics; missing samples
+preserve the previous state, including after expiration. Alerts and recovery use the existing
+confirmed SNS topic. ACM certificates remain externally managed. This does not monitor domain
+registration expiry; keep auto-renew enabled at the registrar.
+
+Incremental cost: no fee for CSP headers or additional IPv6 alias records; two standard
+CloudWatch alarms add at most about **$0.20/month** before shared allowances and occasional
+notification charges. There is no paid uptime health check in this batch.
 
 ### Account security baseline
 
