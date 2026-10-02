@@ -784,6 +784,10 @@ main > section .container {
 #home .role .typed-cursor {
   color: #10B981;
   font-weight: 400;
+  opacity: 1;
+}
+#home .role .typed-cursor.typed-cursor--blink {
+  animation: typed-cursor-blink 0.7s infinite;
 }
 #home .intro {
   max-width: 34rem;
@@ -918,10 +922,15 @@ main > section .container {
 #home.motion-paused .status-pill .dot {
   animation-play-state: paused;
 }
-#home.motion-paused .typed-cursor {
+#home.motion-paused .typed-cursor.typed-cursor--blink {
   animation: none;
 }
 
+@keyframes typed-cursor-blink {
+  50% {
+    opacity: 0;
+  }
+}
 @keyframes orb-drift {
   from {
     transform: translate3d(0, 0, 0) scale(1);

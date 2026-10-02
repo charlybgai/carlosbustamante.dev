@@ -30,6 +30,8 @@ functions/send_email/
 infra/                      # Terraform: AWS (us-east-1) + Google provider (+ google-beta for one quota)
   s3.tf  cloudfront.tf  route53.tf  contact.tf  recaptcha.tf
   monitoring.tf             # SNS email topic + alarms on contact API 5XX and Lambda errors
+  certificates.tf           # Daily ACM expiry alarms for the exact CloudFront certificates
+  csp.tf, csp-policy.txt     # CSP report-only header and shared policy template
   backend.tf                # Remote state: s3://carlosbustamante-ops-terraform-state
   security.tf               # External Access Analyzer + management-event CloudTrail (90-day logs)
   signin.tf, signin-regions.tf # Root/Charly console sign-in alerts in every enabled region
@@ -120,6 +122,12 @@ tools/                      # Asset builders and offline cache-buster checker/te
   real image, so phones and tablets (where it's hidden) don't download it.
 - The reCAPTCHA badge is hidden with `visibility: hidden`. That's only allowed because the
   attribution text is shown next to the form, so keep that text.
+- CSP is initially **report-only**, defined in `infra/csp-policy.txt` and attached through
+  CloudFront's custom response headers. A new library/host needs a policy review; changing an
+  executable inline script needs its SHA-256 hash updated. `tools/check_csp.py` checks all pages.
+  Typed.js must keep `autoInsertCss: false`; cursor CSS belongs in SCSS. No reporting endpoint
+  is configured: inspect browser violations with `tools/check_csp_browser.py`. Move to enforcing
+  CSP only in a separate approved change after a clean live report-only period (about a week).
 
 ## Rules for changes
 
@@ -179,6 +187,9 @@ node --check sites/root/assets/js/script.js
 ./deploy.sh root --dryrun   # deploy checks + list of changed files (read-only)
 ./deploy.sh root --check-only # offline cache-buster checks, no credentials
 python3 -m unittest discover -s tools -p 'test_*.py'
+python3 tools/check_csp.py
+# Requires playwright==1.58.0 and Chromium (see README): API/Google mocked, real CDN libraries
+python3 tools/check_csp_browser.py
 python3 -m http.server 8000 --directory sites/root   # preview at http://localhost:8000 and /es/
 ```
 
@@ -203,6 +214,8 @@ and `grecaptcha` in a headless browser.
   remove `prevent_destroy` without explicit authorization. Keep bootstrap local state backed up.
 - When enabling another AWS region, extend `signin-regions.tf` and the trust-policy region list
   in `signin.tf` so regional break-glass sign-ins still generate email alerts.
+- ACM emits `DaysToExpiry` only twice daily. Keep expiry alarms on a daily window with
+  `treat_missing_data = "ignore"` so sparse samples and expiration don't clear an existing alert.
 
 ## Git
 

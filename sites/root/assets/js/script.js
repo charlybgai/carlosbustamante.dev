@@ -153,6 +153,7 @@
             typed = new window.Typed(typedTarget, {
                 strings: STRINGS.roles,
                 contentType: null,
+                autoInsertCss: false, // Cursor styles live in SCSS so CSP needs no inline CSS.
                 loop: true,
                 typeSpeed: 70,
                 backSpeed: 30,

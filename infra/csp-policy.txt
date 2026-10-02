@@ -1,0 +1,11 @@
+default-src 'self';
+script-src 'self' 'sha256-/x7W7R75k8Roq0WaVRQX9blP4OufE5xbAdzklGxsgpw=' https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/ https://cdnjs.cloudflare.com/ajax/libs/Shuffle/6.1.0/ https://unpkg.com/typed.js@2.1.0/ https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/;
+style-src 'self';
+img-src 'self' data:;
+font-src 'self';
+connect-src 'self' ${contact_api_origin} https://www.google.com/recaptcha/;
+frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/;
+form-action ${contact_form_url};
+frame-ancestors 'none';
+base-uri 'self';
+object-src 'none';
