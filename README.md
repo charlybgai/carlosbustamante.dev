@@ -49,9 +49,9 @@ python3 -m unittest discover -s functions/send_email
 ./cv/build.sh
 ```
 
-`tools/build-bootstrap.sh` and `tools/build-icons.py` regenerate `assets/css/bootstrap.css` and
-`assets/images/icons.svg`; you only need them when changing those. See [AGENTS.md](AGENTS.md)
-for conventions and checks.
+`tools/build-bootstrap.sh`, `tools/build-icons.py` and `tools/build-favicons.py` regenerate
+`assets/css/bootstrap.css`, the `assets/images/icons.svg` sprite, and the favicons plus sidebar
+logo; you only need them when changing those. See [AGENTS.md](AGENTS.md) for conventions and checks.
 
 ## Deployment
 

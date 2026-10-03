@@ -19,6 +19,8 @@ sites/root/                 # Deployed as-is to S3 (the site root)
   assets/css/bootstrap.css  # Bootstrap 5.3.3 subset, built by tools/build-bootstrap.sh (don't edit)
   assets/fonts/             # Self-hosted Inter, Montserrat, Fira Code (Latin woff2) + OFL licenses
   assets/images/icons.svg   # SVG icon sprite (Line Awesome glyphs), built by tools/build-icons.py
+  assets/images/icon.svg, logo.svg, apple-touch-icon.png, and /favicon.ico at the root:
+                            #   favicon set and sidebar logo, all built by tools/build-favicons.py (don't edit)
   assets/images/            # WebP images: certs/, works/, photos, avatar; og-card.jpg (social card);
                             #   hero-aurora.webp = desktop-only home background (set in _home.scss)
   assets/files/CV.pdf       # Resume PDFs (CV.pdf = EN, CV_ES.pdf = ES). Source of truth for career facts
