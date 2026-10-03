@@ -1640,7 +1640,7 @@ html:not(.js) #my_work .wrap[data-project-link=""] .foot .ico {
   width: 100%;
   padding: 0.85rem 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.28);
+  border: 1px solid rgba(148, 163, 184, 0.64);
   background: rgba(15, 23, 42, 0.55);
   color: #F8FAFC;
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -1653,7 +1653,7 @@ html:not(.js) #my_work .wrap[data-project-link=""] .foot .ico {
 }
 #contact_me .form-item input:hover,
 #contact_me .form-item textarea:hover {
-  border-color: rgba(148, 163, 184, 0.45);
+  border-color: rgba(148, 163, 184, 0.8);
 }
 #contact_me .form-item input:focus,
 #contact_me .form-item textarea:focus {

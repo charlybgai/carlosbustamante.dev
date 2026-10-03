@@ -48,7 +48,7 @@
             width: 100%;
             padding: 0.85rem 1rem;
             border-radius: 12px;
-            border: 1px solid $border_strong;
+            border: 1px solid $border_input;
             background: rgba($dark_bg, 0.55);
             color: $text_main;
             font-family: $font_main;
@@ -60,7 +60,7 @@
             }
 
             &:hover {
-                border-color: rgba($gray, 0.45);
+                border-color: rgba($gray, 0.8);
             }
 
             &:focus {
