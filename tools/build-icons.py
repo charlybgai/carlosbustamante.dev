@@ -29,10 +29,10 @@ SOURCES = {  # path -> sha256, pinned so a changed upstream file can't slip in
 SOLID = [
     "arrow-right", "arrow-up", "brain", "briefcase", "calendar-check", "certificate", "cloud",
     "code", "cogs", "download", "envelope", "external-link-alt", "file-alt", "graduation-cap",
-    "home", "language", "layer-group", "map-marker-alt", "paper-plane", "pause", "phone", "play",
+    "home", "language", "layer-group", "map-marker-alt", "paper-plane", "pause", "play",
     "times", "tools", "user",
 ]
-BRANDS = ["github", "kaggle", "linkedin-in"]
+BRANDS = ["github", "kaggle", "linkedin-in", "whatsapp"]
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "sites/root/assets/images/icons.svg"

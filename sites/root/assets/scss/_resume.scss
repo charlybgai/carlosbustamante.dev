@@ -3,13 +3,6 @@
 @use "mixins" as *;
 
 #my_resume {
-    .edu-col {
-        @include above($bp_lg) {
-            position: sticky;
-            top: 2rem;
-        }
-    }
-
     .timeline {
         position: relative;
         padding-left: 2rem;
@@ -49,6 +42,37 @@
             &.is-current::before {
                 background: $primary;
                 box-shadow: 0 0 0 5px rgba($primary, 0.18), 0 0 18px rgba($primary, 0.7);
+            }
+        }
+    }
+
+    // Publication under the Education timeline (no timeline marker, same card)
+    .pub-head {
+        margin-top: 2.5rem;
+    }
+
+    .pub-card {
+        h4 {
+            font-size: 1.02rem;
+            line-height: 1.45;
+        }
+
+        .pub-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-top: 1rem;
+            color: $primary;
+            font-weight: 600;
+            font-size: 0.92rem;
+            text-decoration: none;
+
+            .ico {
+                font-size: 0.85em;
+            }
+
+            &:hover {
+                text-decoration: underline;
             }
         }
     }
