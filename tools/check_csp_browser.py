@@ -70,6 +70,10 @@ def main():
             context.route('https://*.execute-api.us-east-1.amazonaws.com/**', mock_api)
             page = context.new_page()
             page.set_default_timeout(20000)
+            # reCAPTCHA must stay unloaded until someone uses the contact form
+            recaptcha_requests = []
+            page.on('request', lambda request: recaptcha_requests.append(request.url)
+                    if '/recaptcha/' in request.url else None)
             for path in ['/', '/es/']:
                 response = page.goto(base + path, wait_until='load')
                 assert response.status == 200
@@ -93,18 +97,21 @@ def main():
                 expect(page.locator('#workModal')).not_to_be_visible()
                 expect(trigger).to_be_focused()
                 page.locator('a[href="#contact_me"]').first.click()
+                assert not recaptcha_requests, f'reCAPTCHA loaded before the form was used: {recaptcha_requests}'
                 for field, value in {'name': 'CSP browser test', 'email': 'test@example.com', 'subject': 'Intercepted test', 'message': 'This request never reaches AWS.'}.items():
                     page.locator(f'#contactForm [name="{field}"]').fill(value)
                 page.locator('#contactForm button[type="submit"]').click()
                 expect(page.locator('#contactForm .form-status')).to_have_class('form-status is-success')
                 assert len(submissions) == (1 if path == '/' else 2)
                 assert submissions[-1]['g-recaptcha-response'], 'Token missing'
+                assert any('enterprise.js?render=' in url for url in recaptcha_requests), 'reCAPTCHA never loaded'
+                recaptcha_requests.clear()
                 assert not page.evaluate('window.cspViolations'), page.evaluate('window.cspViolations')
                 # Verify the observer really catches report-only violations. No
                 # external request: a harmless unsigned inline script is enough.
                 page.evaluate("const s=document.createElement('script');s.textContent='window.cspNegativeControl=true';document.head.append(s)")
                 page.wait_for_function("window.cspViolations.some(v=>v.directive==='script-src-elem' && v.disposition==='report')")
-                print(f'{path}: navigation, libraries, pause, filters, modal/focus, token and mocked submit passed; zero flow CSP violations; negative control detected.')
+                print(f'{path}: navigation, libraries, pause, filters, modal/focus, on-demand reCAPTCHA, token and mocked submit passed; zero flow CSP violations; negative control detected.')
             response = page.goto(base + '/404.html', wait_until='load')
             assert response.status == 200
             assert response.headers.get(header.lower()) == policy
