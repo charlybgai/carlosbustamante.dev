@@ -14,7 +14,7 @@
 
     const STRINGS = {
         en: {
-            roles: ['Cloud & MLOps Engineer', 'Machine Learning Engineer', 'AI Infrastructure Engineer'],
+            roles: ['AI & MLOps Engineer', 'Machine Learning Engineer', 'AI Infrastructure Engineer'],
             viewProject: 'View project',
             showing: (n) => `Showing ${n} ${n === 1 ? 'project' : 'projects'}`,
             sending: 'Sending your message…',
@@ -31,7 +31,7 @@
             fallback: 'You can also email me at',
         },
         es: {
-            roles: ['Ingeniero Cloud & MLOps', 'Ingeniero de Machine Learning', 'Ingeniero de Infraestructura de IA'],
+            roles: ['Ingeniero de IA y MLOps', 'Ingeniero de Machine Learning', 'Ingeniero de Infraestructura de IA'],
             viewProject: 'Ver proyecto',
             showing: (n) => `Mostrando ${n} ${n === 1 ? 'proyecto' : 'proyectos'}`,
             sending: 'Enviando tu mensaje…',

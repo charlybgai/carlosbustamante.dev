@@ -21,7 +21,8 @@ sites/root/                 # Deployed as-is to S3 (the site root)
   assets/images/icons.svg   # SVG icon sprite (Line Awesome glyphs), built by tools/build-icons.py
   assets/images/icon.svg, logo.svg, apple-touch-icon.png, and /favicon.ico at the root:
                             #   favicon set and sidebar logo, all built by tools/build-favicons.py (don't edit)
-  assets/images/            # WebP images: certs/ (official badges), works/, photos, avatar; og-card.jpg (social card);
+  assets/images/            # WebP images: certs/ (official badges), works/, photos, avatar;
+                            #   og-card.jpg = social card, built by tools/build-og-card.py from tools/og-card.html
                             #   hero-aurora.webp = desktop-only home background (set in _home.scss)
                             #   works/*.webp = card thumbnails built by tools/build-thumbnails.py (don't edit)
   assets/files/CV.pdf       # Resume PDFs (CV.pdf = EN, CV_ES.pdf = ES). Source of truth for career facts
@@ -157,7 +158,8 @@ tools/                      # Asset builders and offline cache-buster checker/te
    deploy a changed file whose tag wasn't bumped, pages that disagree on a tag, or a CSS/JS file
    that no page loads with `?v=`.
 4. When page content changes, update `<lastmod>` in `sitemap.xml`. When metadata changes,
-   update the JSON-LD block and `<meta>` tags in both HTML files.
+   update the JSON-LD block and `<meta>` tags in both HTML files. If the title, current role or
+   hero chips change, update `tools/og-card.html` and re-run `tools/build-og-card.py`.
 5. Career facts (roles, dates, certifications) must match the CV PDFs. Don't invent metrics.
 6. The Lambda has no dependencies. Terraform `archive_file` zips just the one `.py` file.
    Adding a third-party package would mean changing the packaging in `contact.tf`.
