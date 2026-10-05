@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Social card (og:image / twitter:image), 1200x630. Rendered to sites/root/assets/images/og-card.jpg
+     by tools/build-og-card.py. Fonts and the portrait come from the site itself. -->
+<style>
+  @font-face { font-family: "Inter"; font-weight: 400 700; src: url("../sites/root/assets/fonts/inter-latin.woff2") format("woff2"); }
+  @font-face { font-family: "Montserrat"; font-weight: 700 800; src: url("../sites/root/assets/fonts/montserrat-latin.woff2") format("woff2"); }
+  @font-face { font-family: "Fira Code"; font-weight: 400 500; src: url("../sites/root/assets/fonts/fira-code-latin.woff2") format("woff2"); }
+
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #0F172A; }
+  .card { position: relative; width: 1200px; height: 630px; overflow: hidden; color: #F8FAFC;
+    font-family: "Inter", sans-serif;
+    background:
+      radial-gradient(620px 460px at 8% 0%, rgba(16,185,129,.22), transparent 70%),
+      radial-gradient(640px 480px at 100% 100%, rgba(59,130,246,.28), transparent 70%),
+      #0F172A; }
+  .grid { position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(148,163,184,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148,163,184,.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 80% at 30% 45%, #000 20%, transparent 100%); }
+
+  .text { position: absolute; left: 80px; top: 96px; width: 660px; }
+  .pill { display: inline-flex; align-items: center; gap: 12px; padding: 9px 18px; border-radius: 999px;
+    border: 1px solid rgba(16,185,129,.35); background: rgba(16,185,129,.10);
+    font-size: 19px; font-weight: 500; }
+  .pill::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #10B981; }
+  h1 { margin: 34px 0 0; font-family: "Montserrat", sans-serif; font-weight: 800; font-size: 84px;
+    line-height: 1.02; letter-spacing: -1px;
+    background: linear-gradient(100deg, #F8FAFC 25%, #10B981 65%, #6FA3F8 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .role { margin: 30px 0 0; font-family: "Fira Code", monospace; font-size: 30px; font-weight: 500; }
+  .role span { color: #10B981; margin-right: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+  .chip { padding: 9px 18px; border-radius: 999px; border: 1px solid rgba(148,163,184,.28);
+    background: #18223A; font-size: 19px; font-weight: 600; }
+  .chip.accent { border-color: rgba(16,185,129,.45); background: rgba(16,185,129,.12); color: #34D399; }
+  .domain { position: absolute; left: 80px; bottom: 58px; font-family: "Fira Code", monospace;
+    font-size: 21px; color: #94A3B8; }
+
+  .portrait { position: absolute; right: 82px; top: 72px; width: 324px; height: 484px;
+    border-radius: 30px; padding: 5px;
+    background: linear-gradient(160deg, #10B981, #3B82F6);
+    box-shadow: 0 40px 90px -30px rgba(59,130,246,.55), 0 0 60px -20px rgba(16,185,129,.6); }
+  .portrait img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 20%;
+    border-radius: 25px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="grid"></div>
+    <div class="text">
+      <div class="pill">Senior Software Engineer · GlobalLogic</div>
+      <h1>Carlos<br>Bustamante</h1>
+      <p class="role"><span>&gt;</span>AI &amp; MLOps Engineer</p>
+      <div class="chips">
+        <span class="chip accent">AI agents</span>
+        <span class="chip accent">vLLM</span>
+        <span class="chip">AWS</span>
+        <span class="chip">Kubernetes</span>
+        <span class="chip">Terraform</span>
+      </div>
+    </div>
+    <div class="domain">carlosbustamante.dev</div>
+    <div class="portrait"><img src="../sites/root/assets/images/home-pic.webp" alt=""></div>
+  </div>
+</body>
+</html>

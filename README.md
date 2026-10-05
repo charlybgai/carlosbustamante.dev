@@ -1,6 +1,6 @@
-# Carlos Bustamante - Cloud & MLOps Engineer Portfolio
+# Carlos Bustamante - AI & MLOps Engineer Portfolio
 
-Personal portfolio website for **Carlos Bustamante**, Cloud & MLOps Engineer, hosted at
+Personal portfolio website for **Carlos Bustamante**, AI & MLOps Engineer, hosted at
 [carlosbustamante.dev](https://carlosbustamante.dev) (English) and
 [carlosbustamante.dev/es/](https://carlosbustamante.dev/es/) (Spanish).
 
@@ -50,8 +50,9 @@ python3 -m unittest discover -s functions/send_email
 ```
 
 `tools/build-bootstrap.sh`, `tools/build-icons.py`, `tools/build-favicons.py` and
-`tools/build-thumbnails.py` regenerate `assets/css/bootstrap.css`, the `assets/images/icons.svg`
-sprite, the favicons plus sidebar logo, and the portfolio card thumbnails; you only need them when
+`tools/build-thumbnails.py` (plus `tools/build-og-card.py` for the social card) regenerate
+`assets/css/bootstrap.css`, the `assets/images/icons.svg` sprite, the favicons plus sidebar logo,
+and the portfolio card thumbnails; you only need them when
 changing those. See [AGENTS.md](AGENTS.md) for conventions and checks.
 
 ## Deployment
