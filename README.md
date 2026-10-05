@@ -55,8 +55,20 @@ logo; you only need them when changing those. See [AGENTS.md](AGENTS.md) for con
 
 ## Deployment
 
-Sign in with the limited portfolio deploy role. `deploy.sh` selects this profile by default and
-checks the active role before accessing production.
+Merging to `main` deploys automatically: after every CI job passes, the `deploy` job assumes the
+deploy-only `portfolio-github-deploy` role through GitHub OIDC (no stored AWS keys) and runs
+`./deploy.sh root`. One-time setup after `terraform apply` creates the role:
+
+1. In the repo settings, create the environment `production` and limit its deployment branches
+   to `main` (optionally add yourself as a required reviewer for a manual gate).
+2. Save `terraform -chdir=infra output -raw github_deploy_role_arn` as the repository variable
+   `AWS_DEPLOY_ROLE_ARN`. The deploy job is skipped until it exists.
+
+The content bucket is versioned (old versions are kept 30 days), so a bad file can be restored
+from S3; usually reverting the commit is simpler, since CI redeploys it.
+
+To deploy by hand, sign in with the limited portfolio deploy role. `deploy.sh` selects this
+profile by default and checks the active role before accessing production.
 
 ```bash
 aws sso login --profile portfolio-deploy

@@ -10,7 +10,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Never cancel a run on main: it may be in the middle of a deploy
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   terraform:
@@ -88,3 +89,31 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install shellcheck-py==0.10.0.1
       - run: shellcheck deploy.sh cv/build.sh tools/build-bootstrap.sh
+
+  deploy:
+    name: Deploy
+    needs: [terraform, lambda, frontend, shell]
+    # Skipped until the role from infra/deploy.tf exists and its ARN is saved as a repo variable
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.AWS_DEPLOY_ROLE_ARN != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    # The AWS role trusts only this environment; restrict it to main in the repo settings
+    environment:
+      name: production
+      url: https://carlosbustamante.dev
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: github-deploy-${{ github.run_id }}
+          aws-region: us-east-1
+      - run: ./deploy.sh root

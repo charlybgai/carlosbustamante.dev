@@ -54,3 +54,9 @@ variable "subdomains" {
   type        = map(string)
   default     = {}
 }
+
+variable "github_repository" {
+  description = "GitHub repository (owner/name) whose production environment may deploy the site"
+  type        = string
+  default     = "charlybgai/carlosbustamante.dev"
+}

@@ -1,7 +1,7 @@
 # CloudFront function to rewrite requests to index.html
 resource "aws_cloudfront_function" "rewrite_index" {
   name    = "carlosbustamante-rewrite-index-html"
-  runtime = "cloudfront-js-1.0"
+  runtime = "cloudfront-js-2.0"
   comment = "Appends index.html to directory requests for SPA/Static sites"
   publish = true
   code    = <<EOF
@@ -81,6 +81,7 @@ resource "aws_cloudfront_distribution" "content" {
   for_each            = local.content_sites
   enabled             = true
   is_ipv6_enabled     = true
+  http_version        = "http2and3"
   default_root_object = "index.html"
   aliases             = [each.value]
 
@@ -136,6 +137,7 @@ resource "aws_cloudfront_distribution" "content" {
 resource "aws_cloudfront_distribution" "www" {
   enabled         = true
   is_ipv6_enabled = true
+  http_version    = "http2and3"
   aliases         = ["www.${var.root_domain}"]
 
   origin {
