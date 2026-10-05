@@ -1132,31 +1132,41 @@ main > section .container {
   border-radius: 20px;
   box-shadow: inset 0 1px 0 rgba(248, 250, 252, 0.04), 0 24px 48px -32px rgba(0, 0, 0, 0.7);
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
   height: 100%;
-  overflow: hidden;
+  padding: 1.1rem 1.25rem;
   color: inherit;
   text-decoration: none;
   transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
-#about_me .cert-card .thumb {
-  aspect-ratio: 647/500;
-  overflow: hidden;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-  background: rgb(7.4613003096%, 11.4406604747%, 20.8916408669%);
+#about_me .cert-card .badge {
+  flex: 0 0 88px;
 }
-#about_me .cert-card .thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+#about_me .cert-card .badge img {
+  display: block;
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(15, 23, 42, 0.55));
+  transition: transform 0.35s ease;
+}
+@media (max-width: 575.98px) {
+  #about_me .cert-card .badge {
+    flex-basis: 64px;
+  }
+  #about_me .cert-card .badge img {
+    width: 64px;
+    height: 64px;
+  }
 }
 #about_me .cert-card .body {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  padding: 1.1rem 1.25rem 1.25rem;
+  align-self: stretch;
+  gap: 0.35rem;
 }
 #about_me .cert-card .issuer {
   font-size: 0.72rem;
@@ -1177,8 +1187,13 @@ main > section .container {
   gap: 1rem;
   margin-top: auto;
   padding-top: 0.75rem;
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
   font-size: 0.85rem;
   color: #94A3B8;
+}
+#about_me .cert-card .meta > span {
+  white-space: nowrap;
 }
 #about_me .cert-card .verify {
   display: inline-flex;
@@ -1194,7 +1209,7 @@ main > section .container {
   box-shadow: 0 28px 56px -32px rgba(16, 185, 129, 0.55);
 }
 #about_me .cert-card:hover img {
-  transform: scale(1.04);
+  transform: scale(1.06);
 }
 #about_me .cert-card:hover .verify {
   color: #10B981;
