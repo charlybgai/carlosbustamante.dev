@@ -1,0 +1,353 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Project card thumbnails. Rendered to WebP by tools/build-thumbnails.py: one <template> per
+     project, selected with ?p=<id>. Everything is inline SVG, so renders are identical anywhere. -->
+<style>
+  html, body { margin: 0; width: 1200px; height: 750px; overflow: hidden; background: #0F172A; }
+  .frame { position: relative; width: 1200px; height: 750px; overflow: hidden;
+    background:
+      radial-gradient(560px 420px at 20% 10%, rgba(16,185,129,.26), transparent 70%),
+      radial-gradient(640px 460px at 90% 100%, rgba(59,130,246,.30), transparent 70%),
+      #0F172A; }
+  .grid { position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(148,163,184,.07) 2px, transparent 2px),
+      linear-gradient(90deg, rgba(148,163,184,.07) 2px, transparent 2px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 70% 70% at 55% 45%, #000 25%, transparent 100%); }
+  svg.art { position: absolute; inset: 0; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="grid"></div>
+  <svg class="art" id="art" viewBox="0 0 1200 750" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<!-- Shared palette (site tokens): bg #0F172A, emerald #10B981, blue #3B82F6, slate #94A3B8,
+     text #F8FAFC, danger #F87171. Motifs sit around (620, 330) so the label chip corner
+     (bottom left) stays quiet; strokes are thick enough to survive a 300 px wide card. -->
+<template id="defs"><svg>
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22305A"/><stop offset="1" stop-color="#151E36"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="14" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="halo" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="40"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+</svg></template>
+
+<!-- carlosbustamante.dev: browser -> CDN -> bucket, plus the serverless form -->
+<template id="site"><svg>
+  <ellipse cx="620" cy="300" rx="420" ry="180" fill="url(#brand)" opacity=".16" filter="url(#halo)"/>
+  <g fill="none" stroke-width="8" stroke-linecap="round">
+    <path d="M395 250 H500" stroke="#94A3B8" marker-end="url(#arrow)"/>
+    <path d="M740 250 H845" stroke="#94A3B8" marker-end="url(#arrow)"/>
+    <path d="M280 360 V500 H480" stroke="#94A3B8" stroke-dasharray="4 22" marker-end="url(#arrow)"/>
+    <path d="M700 500 H805" stroke="#94A3B8" marker-end="url(#arrow)"/>
+  </g>
+  <!-- browser -->
+  <g transform="translate(280 250)">
+    <rect x="-115" y="-90" width="230" height="180" rx="26" fill="url(#panel)" stroke="#94A3B8" stroke-width="6"/>
+    <path d="M-115 -45 H115" stroke="#94A3B8" stroke-width="6"/>
+    <circle cx="-80" cy="-67" r="9" fill="#F87171"/><circle cx="-52" cy="-67" r="9" fill="#94A3B8"/><circle cx="-24" cy="-67" r="9" fill="#10B981"/>
+    <rect x="-80" y="-15" width="160" height="16" rx="8" fill="#F8FAFC" opacity=".85"/>
+    <rect x="-80" y="15" width="110" height="14" rx="7" fill="#94A3B8" opacity=".6"/>
+    <rect x="-80" y="42" width="70" height="22" rx="11" fill="url(#brand)"/>
+  </g>
+  <!-- CDN globe -->
+  <g transform="translate(620 250)">
+    <circle r="105" fill="url(#brand)" opacity=".35" filter="url(#halo)"/>
+    <circle r="95" fill="url(#panel)" stroke="url(#brand)" stroke-width="9" filter="url(#glow)"/>
+    <ellipse rx="95" ry="36" fill="none" stroke="#94A3B8" stroke-width="5" opacity=".7"/>
+    <ellipse rx="40" ry="95" fill="none" stroke="#94A3B8" stroke-width="5" opacity=".7"/>
+  </g>
+  <!-- bucket -->
+  <g transform="translate(950 250)">
+    <path d="M-90 -70 H90 L72 78 Q0 104 -72 78 Z" fill="url(#panel)" stroke="#10B981" stroke-width="8"/>
+    <ellipse cx="0" cy="-70" rx="90" ry="24" fill="#22305A" stroke="#10B981" stroke-width="8"/>
+  </g>
+  <!-- API + function -->
+  <g transform="translate(590 500)">
+    <rect x="-100" y="-60" width="200" height="120" rx="26" fill="url(#panel)" stroke="#3B82F6" stroke-width="7"/>
+    <path d="M-45 -18 L-70 0 L-45 18 M45 -18 L70 0 L45 18" fill="none" stroke="#F8FAFC" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(900 500)">
+    <rect x="-85" y="-60" width="170" height="120" rx="26" fill="url(#panel)" stroke="#10B981" stroke-width="7"/>
+    <path d="M-24 -38 Q-10 -42 -2 -24 L28 38 M6 -8 L-26 38" fill="none" stroke="#10B981" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg></template>
+
+<!-- Loan Approval Prediction: application -> decision tree -> approved / rejected -->
+<template id="loan"><svg>
+  <ellipse cx="640" cy="320" rx="420" ry="190" fill="url(#brand)" opacity=".14" filter="url(#halo)"/>
+  <!-- application form -->
+  <g transform="translate(270 320) rotate(-6)">
+    <rect x="-100" y="-130" width="200" height="260" rx="22" fill="url(#panel)" stroke="#94A3B8" stroke-width="6"/>
+    <rect x="-65" y="-90" width="130" height="18" rx="9" fill="#F8FAFC" opacity=".85"/>
+    <rect x="-65" y="-45" width="130" height="12" rx="6" fill="#94A3B8" opacity=".55"/>
+    <rect x="-65" y="-15" width="100" height="12" rx="6" fill="#94A3B8" opacity=".55"/>
+    <rect x="-65" y="15" width="115" height="12" rx="6" fill="#94A3B8" opacity=".55"/>
+    <rect x="-65" y="60" width="80" height="30" rx="15" fill="url(#brand)"/>
+  </g>
+  <!-- tree -->
+  <g fill="none" stroke="#94A3B8" stroke-width="7" stroke-linecap="round">
+    <path d="M385 320 H470"/>
+    <path d="M540 320 L620 210 M540 320 L620 430"/>
+    <path d="M620 210 L720 160 M620 210 L720 260 M620 430 L720 380 M620 430 L720 480"/>
+    <path d="M760 160 L890 270 M760 260 L890 270 M760 380 L890 270" stroke="#10B981" opacity=".8"/>
+    <path d="M760 480 L890 470" stroke="#F87171" opacity=".8"/>
+  </g>
+  <g>
+    <circle cx="540" cy="320" r="34" fill="url(#brand)" filter="url(#glow)"/>
+    <circle cx="620" cy="210" r="26" fill="#3B82F6"/><circle cx="620" cy="430" r="26" fill="#3B82F6"/>
+    <g fill="#10B981"><circle cx="740" cy="160" r="20"/><circle cx="740" cy="260" r="20"/><circle cx="740" cy="380" r="20"/></g>
+    <circle cx="740" cy="480" r="20" fill="#F87171"/>
+  </g>
+  <!-- outcomes -->
+  <g transform="translate(950 270)">
+    <circle r="78" fill="#10B981" opacity=".3" filter="url(#halo)"/>
+    <circle r="66" fill="url(#panel)" stroke="#10B981" stroke-width="9" filter="url(#glow)"/>
+    <path d="M-28 2 L-6 24 L32 -22" fill="none" stroke="#10B981" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(925 470)">
+    <circle r="38" fill="url(#panel)" stroke="#F87171" stroke-width="7"/>
+    <path d="M-13 -13 L13 13 M13 -13 L-13 13" stroke="#F87171" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg></template>
+
+<!-- PARIS: a desktop assistant that watches the screen and guides the student -->
+<template id="paris"><svg>
+  <ellipse cx="620" cy="300" rx="400" ry="200" fill="url(#brand)" opacity=".16" filter="url(#halo)"/>
+  <!-- monitor -->
+  <g transform="translate(560 290)">
+    <rect x="-250" y="-160" width="500" height="310" rx="28" fill="url(#panel)" stroke="#94A3B8" stroke-width="7"/>
+    <path d="M-60 150 L-80 215 H80 L60 150" fill="url(#panel)" stroke="#94A3B8" stroke-width="7" stroke-linejoin="round"/>
+    <!-- lab circuit on screen -->
+    <g fill="none" stroke="#3B82F6" stroke-width="7" stroke-linecap="round" opacity=".9">
+      <path d="M-190 40 H-120 L-95 -10 L-60 90 L-30 40 H40"/>
+      <rect x="40" y="10" width="70" height="60" rx="10"/>
+      <path d="M110 40 H180"/>
+    </g>
+    <!-- detection box -->
+    <rect x="-125" y="-40" width="110" height="150" rx="10" fill="none" stroke="#10B981" stroke-width="7" stroke-dasharray="26 14"/>
+    <circle cx="-125" cy="-40" r="10" fill="#10B981"/>
+  </g>
+  <!-- camera / vision eye -->
+  <g transform="translate(560 95)">
+    <circle r="40" fill="url(#panel)" stroke="url(#brand)" stroke-width="8" filter="url(#glow)"/>
+    <circle r="16" fill="#10B981"/>
+  </g>
+  <!-- guidance bubble -->
+  <g transform="translate(930 230)">
+    <path d="M-120 -80 H120 a26 26 0 0 1 26 26 V40 a26 26 0 0 1 -26 26 H-40 L-90 110 L-80 66 H-120 a26 26 0 0 1 -26 -26 V-54 a26 26 0 0 1 26 -26 Z"
+          fill="url(#panel)" stroke="#10B981" stroke-width="8" filter="url(#glow)"/>
+    <rect x="-100" y="-40" width="170" height="18" rx="9" fill="#F8FAFC" opacity=".9"/>
+    <rect x="-100" y="0" width="120" height="16" rx="8" fill="#94A3B8" opacity=".7"/>
+    <path d="M95 -10 l10 -26 l10 26 l26 10 l-26 10 l-10 26 l-10 -26 l-26 -10 z" fill="#10B981"/>
+  </g>
+</svg></template>
+
+<!-- Water Stress Analysis in Mexico: a drop with falling levels, and the stress trend -->
+<template id="water"><svg>
+  <ellipse cx="620" cy="320" rx="400" ry="200" fill="#3B82F6" opacity=".16" filter="url(#halo)"/>
+  <g transform="translate(470 320)">
+    <clipPath id="drop"><path d="M0 -210 C70 -110 150 -40 150 50 a150 150 0 0 1 -300 0 C-150 -40 -70 -110 0 -210 Z"/></clipPath>
+    <path d="M0 -210 C70 -110 150 -40 150 50 a150 150 0 0 1 -300 0 C-150 -40 -70 -110 0 -210 Z" fill="url(#panel)"/>
+    <g clip-path="url(#drop)">
+      <path d="M-160 20 C-90 0 -30 40 40 18 S130 0 160 14 V220 H-160 Z" fill="#3B82F6" opacity=".35"/>
+      <path d="M-160 80 C-90 60 -30 100 40 78 S130 60 160 74 V220 H-160 Z" fill="#3B82F6" opacity=".75"/>
+      <path d="M-160 20 C-90 0 -30 40 40 18 S130 0 160 14" fill="none" stroke="#94A3B8" stroke-width="6" stroke-dasharray="4 16" stroke-linecap="round"/>
+    </g>
+    <path d="M0 -210 C70 -110 150 -40 150 50 a150 150 0 0 1 -300 0 C-150 -40 -70 -110 0 -210 Z" fill="none" stroke="#3B82F6" stroke-width="9" filter="url(#glow)"/>
+    <path d="M-60 -50 q-30 40 -20 90" fill="none" stroke="#F8FAFC" stroke-width="10" stroke-linecap="round" opacity=".5"/>
+  </g>
+  <!-- trend chart -->
+  <g transform="translate(860 330)">
+    <rect x="-150" y="-170" width="300" height="300" rx="28" fill="url(#panel)" stroke="#94A3B8" stroke-width="6"/>
+    <rect x="-105" y="20" width="44" height="70" rx="10" fill="#10B981"/>
+    <rect x="-45" y="-20" width="44" height="110" rx="10" fill="#10B981" opacity=".85"/>
+    <rect x="15" y="-65" width="44" height="155" rx="10" fill="url(#brand)"/>
+    <rect x="75" y="-120" width="44" height="210" rx="10" fill="#F87171"/>
+    <path d="M-115 95 H125" stroke="#94A3B8" stroke-width="6" stroke-linecap="round"/>
+  </g>
+</svg></template>
+
+<!-- IBM Data Science Capstone: notebook cells feeding a chart -->
+<template id="ibm"><svg>
+  <ellipse cx="620" cy="310" rx="400" ry="200" fill="url(#brand)" opacity=".15" filter="url(#halo)"/>
+  <!-- notebook -->
+  <g transform="translate(360 310)">
+    <rect x="-150" y="-180" width="300" height="360" rx="26" fill="url(#panel)" stroke="#94A3B8" stroke-width="6"/>
+    <g>
+      <rect x="-115" y="-140" width="230" height="70" rx="14" fill="#0F172A" stroke="#3B82F6" stroke-width="5"/>
+      <path d="M-95 -115 l16 10 l-16 10" fill="none" stroke="#10B981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="-65" y="-112" width="120" height="12" rx="6" fill="#94A3B8" opacity=".7"/>
+      <rect x="-115" y="-45" width="230" height="70" rx="14" fill="#0F172A" stroke="#3B82F6" stroke-width="5"/>
+      <path d="M-95 -20 l16 10 l-16 10" fill="none" stroke="#10B981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="-65" y="-17" width="90" height="12" rx="6" fill="#94A3B8" opacity=".7"/>
+      <rect x="-115" y="50" width="230" height="95" rx="14" fill="#0F172A" stroke="#10B981" stroke-width="5"/>
+      <path d="M-95 125 L-55 95 L-20 110 L20 75 L55 90 L95 65" fill="none" stroke="#10B981" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+  <path d="M530 310 H610" stroke="#94A3B8" stroke-width="8" stroke-linecap="round" marker-end="url(#arrow)"/>
+  <!-- chart -->
+  <g transform="translate(850 310)">
+    <rect x="-200" y="-180" width="400" height="360" rx="28" fill="url(#panel)" stroke="url(#brand)" stroke-width="7" filter="url(#glow)"/>
+    <g>
+      <circle cx="-110" cy="60" r="16" fill="#3B82F6"/><circle cx="-70" cy="20" r="16" fill="#3B82F6"/>
+      <circle cx="-30" cy="40" r="16" fill="#3B82F6"/><circle cx="10" cy="-20" r="16" fill="#3B82F6"/>
+      <circle cx="50" cy="-10" r="16" fill="#3B82F6"/><circle cx="90" cy="-70" r="16" fill="#3B82F6"/>
+      <circle cx="130" cy="-60" r="16" fill="#3B82F6"/>
+    </g>
+    <path d="M-140 90 L150 -100" stroke="#10B981" stroke-width="10" stroke-linecap="round" filter="url(#glow)"/>
+    <path d="M-150 130 H160 M-150 130 V-140" stroke="#94A3B8" stroke-width="6" stroke-linecap="round" fill="none"/>
+  </g>
+</svg></template>
+
+<!-- QR Attendance System: an ID card with a QR code, checked in -->
+<template id="qr"><svg>
+  <ellipse cx="620" cy="310" rx="400" ry="200" fill="url(#brand)" opacity=".15" filter="url(#halo)"/>
+  <g transform="translate(560 320) rotate(-4)">
+    <rect x="-260" y="-170" width="520" height="340" rx="30" fill="url(#panel)" stroke="#94A3B8" stroke-width="7"/>
+    <rect x="-260" y="-170" width="520" height="70" rx="30" fill="url(#brand)" opacity=".85"/>
+    <rect x="-260" y="-130" width="520" height="30" fill="url(#brand)" opacity=".85"/>
+    <!-- avatar -->
+    <circle cx="-160" cy="-5" r="52" fill="#0F172A" stroke="#94A3B8" stroke-width="6"/>
+    <circle cx="-160" cy="-20" r="20" fill="#94A3B8"/>
+    <path d="M-195 30 a35 30 0 0 1 70 0" fill="#94A3B8"/>
+    <rect x="-215" y="75" width="110" height="16" rx="8" fill="#F8FAFC" opacity=".85"/>
+    <rect x="-205" y="105" width="90" height="12" rx="6" fill="#94A3B8" opacity=".6"/>
+    <!-- QR -->
+    <g id="qrcode" transform="translate(-30 -70)"></g>
+  </g>
+  <!-- check-in badge -->
+  <g transform="translate(860 470)">
+    <circle r="82" fill="#10B981" opacity=".3" filter="url(#halo)"/>
+    <circle r="70" fill="url(#panel)" stroke="#10B981" stroke-width="10" filter="url(#glow)"/>
+    <path d="M-30 2 L-7 26 L34 -24" fill="none" stroke="#10B981" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <!-- scan beam -->
+  <path d="M520 240 H800" stroke="#10B981" stroke-width="8" stroke-linecap="round" opacity=".9" filter="url(#glow)"/>
+</svg></template>
+
+<!-- Credit Card Fraud Detection: a card inside a transaction network, a few nodes flagged -->
+<template id="fraud"><svg>
+  <g id="net"></g>
+  <g transform="translate(620 320) rotate(-8)">
+    <rect x="-210" y="-130" width="420" height="260" rx="30" fill="url(#brand)" opacity=".35" filter="url(#halo)"/>
+    <rect x="-210" y="-130" width="420" height="260" rx="30" fill="url(#panel)" stroke="#94A3B8" stroke-width="7"/>
+    <rect x="-210" y="-130" width="420" height="260" rx="30" fill="url(#brand)" opacity=".14"/>
+    <rect x="-150" y="-60" width="80" height="60" rx="12" fill="none" stroke="#10B981" stroke-width="7"/>
+    <path d="M-150 -30 H-70 M-110 -60 V0" stroke="#10B981" stroke-width="5"/>
+    <g fill="#F8FAFC" opacity=".9">
+      <rect x="-150" y="45" width="60" height="16" rx="8"/><rect x="-75" y="45" width="60" height="16" rx="8"/>
+      <rect x="0" y="45" width="60" height="16" rx="8"/><rect x="75" y="45" width="60" height="16" rx="8"/>
+    </g>
+    <circle cx="140" cy="-70" r="32" fill="#0F172A" stroke="#F87171" stroke-width="7" filter="url(#glow)"/>
+    <path d="M140 -86 V-68 M140 -55 V-54" stroke="#F87171" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg></template>
+
+<!-- Volcanic Eruption Prediction: a volcano with a seismic trace and a countdown ring -->
+<template id="volcano"><svg>
+  <ellipse cx="620" cy="360" rx="420" ry="200" fill="#F87171" opacity=".10" filter="url(#halo)"/>
+  <ellipse cx="620" cy="300" rx="380" ry="180" fill="url(#brand)" opacity=".12" filter="url(#halo)"/>
+  <!-- volcano -->
+  <g transform="translate(560 0)">
+    <path d="M-280 560 L-70 250 Q-40 225 -10 240 L20 230 Q50 220 70 250 L280 560 Z" fill="url(#panel)" stroke="#94A3B8" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M-40 240 L-20 300 L10 270 L30 320 L45 245" fill="none" stroke="#F87171" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+    <g fill="#F87171" opacity=".8">
+      <circle cx="-10" cy="190" r="14"/><circle cx="30" cy="160" r="10"/><circle cx="-30" cy="140" r="8"/>
+    </g>
+  </g>
+  <!-- seismic trace across -->
+  <path d="M140 430 H330 l22 -40 l22 70 l22 -110 l22 150 l22 -190 l22 210 l22 -150 l22 90 l22 -40 H1060"
+        fill="none" stroke="url(#brand)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <!-- countdown ring -->
+  <g transform="translate(930 220)">
+    <circle r="78" fill="url(#panel)" stroke="rgba(148,163,184,.4)" stroke-width="12"/>
+    <circle r="78" fill="none" stroke="#10B981" stroke-width="12" stroke-linecap="round"
+            stroke-dasharray="360 490" transform="rotate(-90)" filter="url(#glow)"/>
+    <path d="M0 -38 V0 L26 18" fill="none" stroke="#F8FAFC" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg></template>
+
+<script>
+  const name = new URLSearchParams(location.search).get("p");
+  const part = id => document.getElementById(id).content.querySelector("svg").innerHTML;
+  const art = document.getElementById("art");
+  art.innerHTML = part("defs") + `<g id="motif">${part(name)}</g>`;
+
+  // Deterministic pseudo-random numbers, so every render is identical
+  let seed = 11;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+  if (name === "fraud") {
+    const nodes = [];
+    for (let i = 0; i < 60 && nodes.length < 30; i++) {
+      const a = rnd() * Math.PI * 2, r = 300 + rnd() * 280;
+      const x = 620 + Math.cos(a) * r * 1.2, y = 320 + Math.sin(a) * r * 0.6;
+      if (x < 60 || x > 1140 || y < 50 || y > 690) continue;
+      if (x < 430 && y > 540) continue; // keep the label corner quiet
+      nodes.push([x, y]);
+    }
+    const flagged = new Set([2, 9, 17]);
+    let g = "";
+    nodes.forEach(([x, y], i) => nodes.forEach(([x2, y2], j) => {
+      if (j > i && Math.hypot(x - x2, y - y2) < 230)
+        g += `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="rgba(148,163,184,.28)" stroke-width="4"/>`;
+    }));
+    nodes.forEach(([x, y], i) => {
+      if (i % 3 === 0 || flagged.has(i))
+        g += `<line x1="${x}" y1="${y}" x2="620" y2="320" stroke="${flagged.has(i) ? "rgba(248,113,113,.7)" : "rgba(16,185,129,.35)"}" stroke-width="5"/>`;
+    });
+    nodes.forEach(([x, y], i) => {
+      g += flagged.has(i)
+        ? `<circle cx="${x}" cy="${y}" r="36" fill="none" stroke="#F87171" stroke-width="5" opacity=".55"/><circle cx="${x}" cy="${y}" r="18" fill="#F87171" filter="url(#glow)"/>`
+        : `<circle cx="${x}" cy="${y}" r="${10 + (i % 3) * 3}" fill="${i % 3 === 0 ? "#3B82F6" : "#10B981"}"/>`;
+    });
+    document.getElementById("net").innerHTML = g;
+  }
+
+  if (name === "qr") {
+    // A decorative QR-like pattern (not a scannable code): three finder squares + random modules
+    const n = 21, m = 11, q = [];
+    const finder = (x, y) => q.push(
+      `<rect x="${x * m}" y="${y * m}" width="${7 * m}" height="${7 * m}" rx="6" fill="none" stroke="#F8FAFC" stroke-width="${m}" transform="translate(${m / 2} ${m / 2}) scale(${(7 * m - m) / (7 * m)})"/>`,
+      `<rect x="${(x + 2) * m}" y="${(y + 2) * m}" width="${3 * m}" height="${3 * m}" rx="3" fill="#F8FAFC"/>`);
+    const inFinder = (x, y) => (x < 8 && y < 8) || (x > n - 9 && y < 8) || (x < 8 && y > n - 9);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++)
+      if (!inFinder(x, y) && rnd() < 0.5) q.push(`<rect x="${x * m}" y="${y * m}" width="${m}" height="${m}" fill="#F8FAFC"/>`);
+    finder(0, 0); finder(n - 7, 0); finder(0, n - 7);
+    document.getElementById("qrcode").innerHTML =
+      `<rect x="-14" y="-14" width="${n * m + 28}" height="${n * m + 28}" rx="16" fill="#0F172A" stroke="#10B981" stroke-width="5"/>` + q.join("");
+  }
+
+  // Fit the motif into the band both crops keep: the card shows the full 16:10 frame (with its
+  // label chip bottom left), the popup a centered ~21:9 strip (about y 146-603). Center it at
+  // y 375 and shrink it to 420 px tall if needed. Halos are ignored when measuring; the fraud
+  // network is a full-bleed background, so it is left as drawn.
+  if (name !== "fraud") {
+    const motif = document.getElementById("motif");
+    const halos = [...motif.querySelectorAll('[filter="url(#halo)"]')];
+    halos.forEach(h => h.style.display = "none");
+    const bb = motif.getBBox();
+    halos.forEach(h => h.style.display = "");
+    const s = Math.min(1, 420 / bb.height, 1040 / bb.width);
+    const cx = bb.x + bb.width / 2, cy = bb.y + bb.height / 2;
+    motif.setAttribute("transform", `translate(${cx} 375) scale(${s}) translate(${-cx} ${-cy})`);
+  }
+</script>
+</body>
+</html>

@@ -21,8 +21,9 @@ sites/root/                 # Deployed as-is to S3 (the site root)
   assets/images/icons.svg   # SVG icon sprite (Line Awesome glyphs), built by tools/build-icons.py
   assets/images/icon.svg, logo.svg, apple-touch-icon.png, and /favicon.ico at the root:
                             #   favicon set and sidebar logo, all built by tools/build-favicons.py (don't edit)
-  assets/images/            # WebP images: certs/, works/, photos, avatar; og-card.jpg (social card);
+  assets/images/            # WebP images: certs/ (official badges), works/, photos, avatar; og-card.jpg (social card);
                             #   hero-aurora.webp = desktop-only home background (set in _home.scss)
+                            #   works/*.webp = card thumbnails built by tools/build-thumbnails.py (don't edit)
   assets/files/CV.pdf       # Resume PDFs (CV.pdf = EN, CV_ES.pdf = ES). Source of truth for career facts
   sitemap.xml, robots.txt
   googlee0a7ad9869d1b1e8.html   # Google Search Console verification. Don't delete it.
@@ -87,6 +88,11 @@ tools/                      # Asset builders and offline cache-buster checker/te
   without JS every section is visible). Any same-page link to a section id (nav, logo,
   buttons) is routed by `script.js`, which updates the URL hash, supports back/forward and
   deep links, and carries the hash over to the other language's link.
+- Portfolio card thumbnails are generated: each project is a `<template>` in `tools/thumbnails.html`
+  (shared background + one bold SVG illustration). Add it to `THUMBNAILS` in
+  `tools/build-thumbnails.py`, run
+  `uvx --from playwright==1.58.0 --with pillow==11.3.0 python tools/build-thumbnails.py <name>`,
+  and use `assets/images/works/<name>.webp` (1200×750) in the card and its `data-image`.
 - Portfolio cards: `.item` with `data-groups='["ds-ml","cloud","education"]'` (Shuffle.js
   filters), containing `<article class="wrap">`. The modal reads `data-title`, `data-image`,
   `data-description`, `data-type`, `data-completed`, `data-skills` (comma-separated → chips),

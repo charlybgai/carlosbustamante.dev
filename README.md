@@ -12,7 +12,7 @@ carlosbustamante.dev/
 ├── functions/send_email # Python Lambda behind the contact form, with its unit tests
 ├── infra/               # Terraform (AWS + Google reCAPTCHA Enterprise)
 ├── cv/                  # LaTeX sources of the CVs and their build script
-├── tools/               # Build scripts for the Bootstrap subset and the icon sprite
+├── tools/               # Build scripts (Bootstrap subset, icons, favicons, project thumbnails)
 └── deploy.sh            # Uploads the site to S3 and invalidates CloudFront
 ```
 
@@ -49,9 +49,10 @@ python3 -m unittest discover -s functions/send_email
 ./cv/build.sh
 ```
 
-`tools/build-bootstrap.sh`, `tools/build-icons.py` and `tools/build-favicons.py` regenerate
-`assets/css/bootstrap.css`, the `assets/images/icons.svg` sprite, and the favicons plus sidebar
-logo; you only need them when changing those. See [AGENTS.md](AGENTS.md) for conventions and checks.
+`tools/build-bootstrap.sh`, `tools/build-icons.py`, `tools/build-favicons.py` and
+`tools/build-thumbnails.py` regenerate `assets/css/bootstrap.css`, the `assets/images/icons.svg`
+sprite, the favicons plus sidebar logo, and the portfolio card thumbnails; you only need them when
+changing those. See [AGENTS.md](AGENTS.md) for conventions and checks.
 
 ## Deployment
 
