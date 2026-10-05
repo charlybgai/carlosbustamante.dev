@@ -1200,12 +1200,6 @@ main > section .container {
   color: #10B981;
 }
 
-@media (min-width: 992px) {
-  #my_resume .edu-col {
-    position: sticky;
-    top: 2rem;
-  }
-}
 #my_resume .timeline {
   position: relative;
   padding-left: 2rem;
@@ -1240,6 +1234,29 @@ main > section .container {
 #my_resume .timeline > li.is-current::before {
   background: #10B981;
   box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.18), 0 0 18px rgba(16, 185, 129, 0.7);
+}
+#my_resume .pub-head {
+  margin-top: 2.5rem;
+}
+#my_resume .pub-card h4 {
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+#my_resume .pub-card .pub-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  color: #10B981;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+#my_resume .pub-card .pub-link .ico {
+  font-size: 0.85em;
+}
+#my_resume .pub-card .pub-link:hover {
+  text-decoration: underline;
 }
 #my_resume .t-card {
   background: linear-gradient(180deg, rgba(9.040247678%, 13.8617131063%, 25.3126934985%, 0.72) 0%, rgba(7.4613003096%, 11.4406604747%, 20.8916408669%, 0.72) 100%);
