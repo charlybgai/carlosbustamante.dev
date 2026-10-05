@@ -143,3 +143,58 @@ run "certificate_alert_www_fallback" {
     error_message = "When no separate www certificate is configured, watch the apex certificate just as CloudFront does."
   }
 }
+
+run "github_deploy_role_is_scoped" {
+  command = plan
+
+  # The policies embed ARNs that are only known after apply; give them stand-ins during plan
+  override_resource {
+    target          = aws_iam_openid_connect_provider.github
+    override_during = plan
+    values          = { arn = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com" }
+  }
+  override_resource {
+    target          = aws_s3_bucket.content
+    override_during = plan
+    values          = { arn = "arn:aws:s3:::example.com", id = "example.com" }
+  }
+  override_resource {
+    target          = aws_cloudfront_distribution.content
+    override_during = plan
+    values          = { arn = "arn:aws:cloudfront::123456789012:distribution/EXAMPLE" }
+  }
+
+  assert {
+    condition = (
+      jsondecode(aws_iam_role.github_deploy.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:sub"] ==
+      "repo:charlybgai/carlosbustamante.dev:environment:production" &&
+      jsondecode(aws_iam_role.github_deploy.assume_role_policy).Statement[0].Condition.StringEquals["token.actions.githubusercontent.com:aud"] == "sts.amazonaws.com"
+    )
+    error_message = "Only the repository's production environment (the CI deploy job) may assume the GitHub deploy role."
+  }
+
+  assert {
+    condition = toset(flatten([
+      for statement in jsondecode(aws_iam_role_policy.github_deploy.policy).Statement : statement.Action
+      ])) == toset([
+      "s3:ListBucket", "s3:GetObject", "s3:PutObject", "s3:DeleteObject",
+      "cloudfront:CreateInvalidation", "cloudfront:GetInvalidation",
+    ])
+    error_message = "The GitHub deploy role may only sync the site bucket and invalidate its distribution."
+  }
+}
+
+run "site_health_alarm" {
+  command = plan
+
+  assert {
+    condition = (
+      aws_route53_health_check.site.fqdn == var.root_domain &&
+      aws_route53_health_check.site.type == "HTTPS" &&
+      aws_cloudwatch_metric_alarm.site_down.namespace == "AWS/Route53" &&
+      aws_cloudwatch_metric_alarm.site_down.comparison_operator == "LessThanThreshold" &&
+      aws_cloudwatch_metric_alarm.site_down.threshold == 1
+    )
+    error_message = "The site health alarm must watch HTTPS on the apex domain and fire when the check reports unhealthy."
+  }
+}

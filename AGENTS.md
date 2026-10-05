@@ -31,7 +31,9 @@ functions/send_email/
   test_lambda_function.py   # Unit tests (stdlib only; boto3 and network are faked)
 infra/                      # Terraform: AWS (us-east-1) + Google provider (+ google-beta for one quota)
   s3.tf  cloudfront.tf  route53.tf  contact.tf  recaptcha.tf
-  monitoring.tf             # SNS email topic + alarms on contact API 5XX and Lambda errors
+                            #   (content bucket is versioned; old versions expire after 30 days)
+  monitoring.tf             # SNS email topic + alarms on contact API 5XX, Lambda errors, site down
+  deploy.tf                 # GitHub OIDC provider + deploy-only role for the CI deploy job
   certificates.tf           # Daily ACM expiry alarms for the exact CloudFront certificates
   csp.tf, csp-policy.txt     # CSP report-only header and shared policy template
   backend.tf                # Remote state: s3://carlosbustamante-ops-terraform-state
@@ -42,7 +44,8 @@ infra/                      # Terraform: AWS (us-east-1) + Google provider (+ go
 deploy.sh                   # Uploads sites/root to S3 (with Cache-Control), deletes extras, invalidates CloudFront
 cv/                         # CV sources: CV.tex (EN), CV_ES.tex (ES), shared style.tex, build.sh
 tools/                      # Asset builders and offline cache-buster checker/tests
-.github/workflows/ci.yml     # PR/main checks; no cloud credentials, actions pinned by SHA
+.github/workflows/ci.yml     # PR/main checks (no cloud credentials), then deploy on main via OIDC;
+                            #   actions pinned by SHA
 ```
 
 ## How the pieces connect
@@ -201,12 +204,18 @@ and `grecaptcha` in a headless browser.
 
 ## High-risk actions (ask the user first)
 
+- **Merging to `main` deploys.** When every CI job passes on `main`, the `deploy` job (GitHub
+  environment `production`) assumes `portfolio-github-deploy` through OIDC and runs
+  `./deploy.sh root`. It is skipped while the repo variable `AWS_DEPLOY_ROLE_ARN` is unset.
+  Treat a merge like a deploy and ask first.
 - `./deploy.sh root` pushes to **production**: it re-uploads every file, deletes bucket files
   that don't exist locally, and invalidates CloudFront distribution `E6VISQC42W7BR`. It skips
   `assets/scss/` and `*.map`. It only runs from a clean `main` that matches `origin/main`, so
   merge first. `./deploy.sh root --dryrun` shows the checks and the changed files without
   touching anything (works on any branch). The script defaults to the `portfolio-deploy` SSO
-  profile and checks that the caller has its deploy-only role. Use `portfolio-admin` for Terraform.
+  profile (or environment credentials in CI) and checks that the caller is one of the two
+  deploy-only roles. Use `portfolio-admin` for Terraform. Roll back a bad file from its previous
+  S3 version, or revert the commit and let CI redeploy.
 - `terraform apply` changes live resources and the shared remote state (DNS, CDN, SES, Lambda,
   reCAPTCHA). Run `plan` and show the output first.
 - Terraform state and the Lambda env contain the GCP API key. Don't print

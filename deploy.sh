@@ -15,8 +15,11 @@
 # files in the bucket that don't exist locally are deleted.
 set -euo pipefail
 
-# Site deployments use the limited IAM Identity Center role unless explicitly overridden.
-export AWS_PROFILE="${AWS_PROFILE:-portfolio-deploy}"
+# Site deployments use the limited IAM Identity Center role unless explicitly overridden. In
+# GitHub Actions the credentials come from the environment (OIDC role), so no profile is set.
+if [[ -z "${AWS_ACCESS_KEY_ID:-}" ]]; then
+    export AWS_PROFILE="${AWS_PROFILE:-portfolio-deploy}"
+fi
 
 BUCKET_NAME="carlosbustamante.dev"
 BUCKET="s3://${BUCKET_NAME}"
@@ -190,7 +193,8 @@ fi
 echo -e "${BLUE}🚀 Deploying the portfolio$([[ $DRYRUN -eq 1 ]] && echo ' (dry run)')...${NC}"
 CALLER_ARN=$(aws sts get-caller-identity --query Arn --output text) ||
     { echo "error: AWS credentials aren't working" >&2; exit 1; }
-if [[ ! "$CALLER_ARN" =~ ^arn:aws:sts::[0-9]{12}:assumed-role/AWSReservedSSO_PortfolioDeploy_[A-Za-z0-9]+/[^/]+$ ]]; then
+# Only the deploy-only roles: the SSO permission set, or the GitHub Actions role (infra/deploy.tf)
+if [[ ! "$CALLER_ARN" =~ ^arn:aws:sts::[0-9]{12}:assumed-role/(AWSReservedSSO_PortfolioDeploy_[A-Za-z0-9]+|portfolio-github-deploy)/[^/]+$ ]]; then
     echo "error: sign in with the portfolio-deploy SSO profile before deploying" >&2
     exit 1
 fi

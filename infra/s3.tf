@@ -41,6 +41,43 @@ resource "aws_s3_bucket_policy" "content" {
   })
 }
 
+# Versioning keeps the previous copy of every file deploy.sh overwrites or deletes, so a bad
+# deploy can be rolled back from S3. Old copies expire after 30 days to keep storage negligible.
+resource "aws_s3_bucket_versioning" "content" {
+  for_each = local.content_sites
+  bucket   = aws_s3_bucket.content[each.key].id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "content" {
+  for_each = local.content_sites
+  bucket   = aws_s3_bucket.content[each.key].id
+
+  rule {
+    id     = "expire-old-versions"
+    status = "Enabled"
+    filter {}
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+
+    # Delete markers left after their old versions expire
+    expiration {
+      expired_object_delete_marker = true
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
+  }
+
+  depends_on = [aws_s3_bucket_versioning.content]
+}
+
 # WWW redirect bucket - redirects www.carlosbustamante.dev to carlosbustamante.dev
 resource "aws_s3_bucket" "www" {
   bucket = "www.${var.root_domain}"

@@ -28,3 +28,8 @@ output "recaptcha_site_key" {
   description = "reCAPTCHA Enterprise site key for frontend use"
   value       = google_recaptcha_enterprise_key.portfolio_contact_form.name
 }
+
+output "github_deploy_role_arn" {
+  description = "Role the GitHub Actions deploy job assumes (repository variable AWS_DEPLOY_ROLE_ARN)"
+  value       = aws_iam_role.github_deploy.arn
+}
