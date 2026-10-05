@@ -3,7 +3,8 @@
  *
  * - The language comes from <html lang>. All UI strings live in STRINGS below.
  * - The API endpoint is the contact form's `action` attribute and the reCAPTCHA
- *   site key is its `data-recaptcha-key` attribute, so there are no URLs or keys here.
+ *   site key is its `data-recaptcha-key` attribute, so there are no deployment URLs or keys
+ *   here. Google's reCAPTCHA script is loaded only once someone starts using the form.
  * - Sections are shown one at a time. The URL hash (#about_me, ...) selects the
  *   section, so sections can be bookmarked and back/forward works.
  */
@@ -395,8 +396,37 @@
         });
     }
 
+    // reCAPTCHA Enterprise is about 0.7 MB of Google scripts, frames and fonts, and only people
+    // who send a message need it. So it's loaded on the first interaction with the form (or on
+    // submit, e.g. after autofill) instead of on every page view.
+    const RECAPTCHA_SRC = 'https://www.google.com/recaptcha/enterprise.js';
+    let recaptchaLoading = null;
+
+    function loadRecaptcha(siteKey) {
+        if (!recaptchaLoading) {
+            recaptchaLoading = new Promise((resolve, reject) => {
+                const tag = document.createElement('script');
+                tag.src = `${RECAPTCHA_SRC}?render=${encodeURIComponent(siteKey)}`;
+                tag.async = true;
+                tag.addEventListener('load', resolve, { once: true });
+                tag.addEventListener('error', () => {
+                    recaptchaLoading = null; // a later attempt can retry
+                    tag.remove();
+                    reject(fail('captcha'));
+                }, { once: true });
+                document.head.append(tag);
+            });
+        }
+        return recaptchaLoading;
+    }
+
     async function getRecaptchaToken(siteKey) {
         if (!siteKey) throw fail('captcha');
+        // On demand the download can still be in flight at submit time, so allow for it
+        await Promise.race([
+            loadRecaptcha(siteKey),
+            new Promise((_, reject) => setTimeout(() => reject(fail('captcha')), 15000)),
+        ]);
         const api = await waitFor(() => window.grecaptcha && window.grecaptcha.enterprise, 5000);
         return new Promise((resolve, reject) => {
             const timer = setTimeout(() => reject(fail('captcha')), 10000);
@@ -459,6 +489,13 @@
                 status.append(` ${STRINGS.fallback} `, link, '.');
             }
         };
+
+        // Start loading reCAPTCHA as soon as someone shows intent to write a message
+        const preloadRecaptcha = () => {
+            if (siteKey) loadRecaptcha(siteKey).catch(() => {}); // submit retries and reports it
+        };
+        form.addEventListener('focusin', preloadRecaptcha, { once: true });
+        form.addEventListener('input', preloadRecaptcha, { once: true });
 
         const setBusy = (busy) => {
             sending = busy;

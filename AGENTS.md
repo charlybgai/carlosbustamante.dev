@@ -62,7 +62,9 @@ tools/                      # Asset builders and offline cache-buster checker/te
   invalidates `/*`); `main.css`/`script.js` are cached for a year because their `?v=` tag changes
   with every edit; images and PDFs for a day. Missing paths (S3 returns 403 or 404) get `/404.html` with status 404. Every URL
   in `404.html` must be root-absolute, because it's served at the missing path.
-- Contact form: the `submit` handler in `script.js` runs after native HTML validation, gets a
+- Contact form: `script.js` loads Google's `enterprise.js` only on the first focus/input in the
+  form (about 2.6 MB uncompressed that most visitors never need), and on submit if it isn't
+  loaded yet. The `submit` handler runs after native HTML validation, gets a
   reCAPTCHA Enterprise token (action `submit`), and POSTs JSON to API Gateway
   `/prod/sendemail`. The Lambda verifies the token with Google (min score 0.5, action `submit`,
   hostname = the production domain) and sends the message through SES. The UI shows status
@@ -77,8 +79,8 @@ tools/                      # Asset builders and offline cache-buster checker/te
 - Hardcoded frontend values live only in the two HTML files (`script.js` reads them from the
   form). If Terraform ever recreates these resources, update both HTML files:
   - API Gateway URL: the contact form's `action` attribute
-  - reCAPTCHA site key `6LdBoB8q...`: the form's `data-recaptcha-key` and the
-    `enterprise.js?render=` script tag
+  - reCAPTCHA site key `6LdBoB8q...`: the form's `data-recaptcha-key` (script.js builds the
+    `enterprise.js?render=` URL from it; don't add a script tag to the pages)
 - The CORS origin comes from `local.allowed_origin` in `contact.tf` (`https://${var.root_domain}`):
   the Lambda `ALLOWED_ORIGIN` env var, the OPTIONS mock response and the gateway responses.
 
