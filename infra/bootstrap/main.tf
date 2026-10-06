@@ -59,6 +59,28 @@ resource "aws_s3_bucket_lifecycle_configuration" "state" {
       expired_object_delete_marker = true
     }
   }
+  # charlyfive.com keeps its state under charlyfive/ in this bucket; same retention as portfolio/
+  rule {
+    id     = "retain-charlyfive-state-history"
+    status = "Enabled"
+    filter {
+      prefix = "charlyfive/"
+    }
+    noncurrent_version_expiration {
+      noncurrent_days           = 90
+      newer_noncurrent_versions = 10
+    }
+  }
+  rule {
+    id     = "remove-charlyfive-expired-delete-markers"
+    status = "Enabled"
+    filter {
+      prefix = "charlyfive/"
+    }
+    expiration {
+      expired_object_delete_marker = true
+    }
+  }
   rule {
     id     = "abort-incomplete-uploads"
     status = "Enabled"
