@@ -109,11 +109,14 @@ compares assets with S3 to detect a changed file whose tag was not bumped.
 
 ### CSP and certificate monitoring
 
-`infra/csp-policy.txt` is the source for the **report-only** CloudFront CSP header. It allows
+`infra/csp-policy.txt` is the source for the **enforced** CloudFront `Content-Security-Policy`
+header (it ran report-only for a week first). It allows
 the pinned CDN library paths, Google's reCAPTCHA sources and the contact API. The frontend
 keeps inline JavaScript limited to the hashed first-paint helper; Typed.js cursor styles are
 compiled from SCSS. CI checks the hashes and exercises EN, ES and 404 in Chromium, including
-navigation, filters, modal focus, motion pause and a contact submission intercepted before AWS.
+navigation, filters, modal focus, motion pause, the on-demand reCAPTCHA load and a contact
+submission intercepted before AWS. Anything the policy doesn't allow is blocked, so a new
+library, host or inline script needs a policy update in the same change.
 
 ```bash
 python3 tools/check_csp.py
@@ -122,14 +125,16 @@ python3 -m playwright install chromium
 python3 tools/check_csp_browser.py
 # Localhost is allowed by the real reCAPTCHA key; the API is still intercepted:
 python3 tools/check_csp_browser.py --real-recaptcha
-# After the approved production apply/deploy, verify the actual report-only header:
+# Other engines (WebKit needs a few system libraries; see `playwright install-deps`):
+python3 tools/check_csp_browser.py --browser firefox
+# After an approved production apply/deploy, verify the actual header:
 python3 tools/check_csp_browser.py --live --real-recaptcha
 ```
 
 Browser checks use real CDN libraries with the page's SRI checks. Google is mocked by default;
 `--real-recaptcha` loads Google's real script and requests a token but never sends an email.
-No public CSP report receiver is created. Inspect violation events locally and on production,
-then repeat after about a week before proposing enforcement in a separate PR.
+No public CSP report receiver is created; the checks listen for violation events in the browser.
+`--report-only` checks the report-only header instead, e.g. to trial a policy change.
 
 `infra/certificates.tf` alarms on fewer than 30 days remaining for the exact ACM certificates
 configured on CloudFront. A daily window matches ACM's twice-daily metrics; missing samples

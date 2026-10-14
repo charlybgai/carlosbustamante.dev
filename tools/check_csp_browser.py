@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Exercise the site under CSP without posting messages to production.
 
-Requires playwright==1.58.0 and its Chromium browser. Local mode injects the
-Terraform policy; --live checks the actual production report-only header.
+Requires playwright==1.58.0 and its browsers (Chromium by default; --browser firefox or
+webkit). Local mode injects the Terraform policy as an enforced Content-Security-Policy
+header (--report-only for the report-only header); --live checks the actual production header.
 Google is mocked unless --real-recaptcha is supplied. API requests are always
 intercepted, including in live mode. CDN libraries remain real, including SRI.
 """
@@ -21,10 +22,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--live', action='store_true')
     parser.add_argument('--real-recaptcha', action='store_true')
+    parser.add_argument('--report-only', action='store_true',
+                        help='expect Content-Security-Policy-Report-Only instead of the enforced header')
+    parser.add_argument('--browser', choices=['chromium', 'firefox', 'webkit'], default='chromium')
     parser.add_argument('--browser-executable')
     args = parser.parse_args()
     policy = check()
-    header = 'Content-Security-Policy-Report-Only'
+    header = 'Content-Security-Policy-Report-Only' if args.report_only else 'Content-Security-Policy'
+    disposition = 'report' if args.report_only else 'enforce'
 
     class Handler(SimpleHTTPRequestHandler):
         def end_headers(self):
@@ -46,7 +51,7 @@ def main():
             options = {'headless': True}
             if args.browser_executable:
                 options['executable_path'] = args.browser_executable
-            browser = playwright.chromium.launch(**options)
+            browser = getattr(playwright, args.browser).launch(**options)
             context = browser.new_context(viewport={'width': 1280, 'height': 900})
             context.add_init_script("""
                 window.cspViolations = [];
@@ -107,16 +112,19 @@ def main():
                 assert any('enterprise.js?render=' in url for url in recaptcha_requests), 'reCAPTCHA never loaded'
                 recaptcha_requests.clear()
                 assert not page.evaluate('window.cspViolations'), page.evaluate('window.cspViolations')
-                # Verify the observer really catches report-only violations. No
-                # external request: a harmless unsigned inline script is enough.
+                # Verify the observer really catches violations with the expected disposition
+                # (blocked when enforced). No external request: a harmless unsigned inline
+                # script is enough. Engines name the directive script-src-elem or script-src.
                 page.evaluate("const s=document.createElement('script');s.textContent='window.cspNegativeControl=true';document.head.append(s)")
-                page.wait_for_function("window.cspViolations.some(v=>v.directive==='script-src-elem' && v.disposition==='report')")
-                print(f'{path}: navigation, libraries, pause, filters, modal/focus, on-demand reCAPTCHA, token and mocked submit passed; zero flow CSP violations; negative control detected.')
+                page.wait_for_function(f"window.cspViolations.some(v=>v.directive.startsWith('script-src') && v.disposition==='{disposition}')")
+                if not args.report_only:
+                    assert not page.evaluate('window.cspNegativeControl'), 'Enforced CSP did not block an unsigned inline script'
+                print(f'{args.browser} {header} {path}: navigation, libraries, pause, filters, modal/focus, on-demand reCAPTCHA, token and mocked submit passed; zero flow CSP violations; negative control detected.')
             response = page.goto(base + '/404.html', wait_until='load')
             assert response.status == 200
             assert response.headers.get(header.lower()) == policy
             assert not page.evaluate('window.cspViolations'), page.evaluate('window.cspViolations')
-            print('/404.html: zero CSP violations.')
+            print(f'{args.browser} {header} /404.html: zero CSP violations.')
             browser.close()
     finally:
         if server:

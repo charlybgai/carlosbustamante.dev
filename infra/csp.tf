@@ -1,4 +1,4 @@
-# Report-only first: inspect browser violations before a separate enforcement PR.
+# Enforced since 2026-10 after a clean report-only period (Chromium and Firefox checked live).
 # Keep the readable template shared with tools/check_csp.py and the browser check.
 locals {
   content_security_policy = join(" ", split("\n", trimspace(templatefile("${path.module}/csp-policy.txt", {

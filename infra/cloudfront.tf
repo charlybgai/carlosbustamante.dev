@@ -63,7 +63,7 @@ resource "aws_cloudfront_response_headers_policy" "security" {
 
   custom_headers_config {
     items {
-      header   = "Content-Security-Policy-Report-Only"
+      header   = "Content-Security-Policy"
       value    = local.content_security_policy
       override = true
     }
