@@ -53,6 +53,13 @@ resource "aws_cloudfront_response_headers_policy" "security" {
       override        = true
     }
 
+    # The enforced CSP must use this block: CloudFront refuses Content-Security-Policy as a
+    # custom header (the report-only header was allowed there).
+    content_security_policy {
+      content_security_policy = local.content_security_policy
+      override                = true
+    }
+
     strict_transport_security {
       access_control_max_age_sec = 31536000
       include_subdomains         = true
@@ -62,12 +69,6 @@ resource "aws_cloudfront_response_headers_policy" "security" {
   }
 
   custom_headers_config {
-    items {
-      header   = "Content-Security-Policy"
-      value    = local.content_security_policy
-      override = true
-    }
-
     items {
       header   = "Permissions-Policy"
       value    = "camera=(), geolocation=(), microphone=()"

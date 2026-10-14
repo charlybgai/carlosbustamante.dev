@@ -208,19 +208,20 @@ run "csp_is_enforced" {
     values          = { invoke_url = "https://abc123.execute-api.us-east-1.amazonaws.com/prod" }
   }
 
+  # CloudFront only accepts the enforced CSP in security_headers_config, not as a custom header
   assert {
-    condition = anytrue([
-      for item in one(aws_cloudfront_response_headers_policy.security.custom_headers_config).items :
-      item.header == "Content-Security-Policy" && item.value == local.content_security_policy
-    ])
-    error_message = "CloudFront must send the policy as an enforced Content-Security-Policy header."
+    condition = (
+      one(one(aws_cloudfront_response_headers_policy.security.security_headers_config).content_security_policy).content_security_policy == local.content_security_policy &&
+      one(one(aws_cloudfront_response_headers_policy.security.security_headers_config).content_security_policy).override
+    )
+    error_message = "CloudFront must enforce the policy through security_headers_config.content_security_policy."
   }
 
   assert {
     condition = !anytrue([
       for item in one(aws_cloudfront_response_headers_policy.security.custom_headers_config).items :
-      item.header == "Content-Security-Policy-Report-Only"
+      startswith(lower(item.header), "content-security-policy")
     ])
-    error_message = "Don't send a report-only CSP alongside the enforced one."
+    error_message = "Don't send a CSP as a custom header: CloudFront rejects the enforced one, and a report-only copy would duplicate it."
   }
 }
