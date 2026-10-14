@@ -137,7 +137,8 @@ tools/                      # Asset builders and offline cache-buster checker/te
 - The reCAPTCHA badge is hidden with `visibility: hidden`. That's only allowed because the
   attribution text is shown next to the form, so keep that text.
 - CSP is **enforced** (`Content-Security-Policy`), defined in `infra/csp-policy.txt` and attached
-  through CloudFront's custom response headers. Anything it doesn't allow is blocked in the
+  through the response headers policy's `security_headers_config.content_security_policy`
+  (CloudFront rejects an enforced CSP as a custom header). Anything it doesn't allow is blocked in the
   browser, so a new library/host needs a policy update in the same change, and changing an
   executable inline script needs its SHA-256 hash updated. `tools/check_csp.py` checks all pages.
   Typed.js must keep `autoInsertCss: false`; cursor CSS belongs in SCSS. No reporting endpoint
