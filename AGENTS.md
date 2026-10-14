@@ -37,7 +37,7 @@ infra/                      # Terraform: AWS (us-east-1) + Google provider (+ go
   monitoring.tf             # SNS email topic + alarms on contact API 5XX, Lambda errors, site down
   deploy.tf                 # GitHub OIDC provider + deploy-only role for the CI deploy job
   certificates.tf           # Daily ACM expiry alarms for the exact CloudFront certificates
-  csp.tf, csp-policy.txt     # CSP report-only header and shared policy template
+  csp.tf, csp-policy.txt     # Enforced CSP header and shared policy template
   backend.tf                # Remote state: s3://carlosbustamante-ops-terraform-state
   security.tf               # External Access Analyzer + management-event CloudTrail (90-day logs)
   signin.tf, signin-regions.tf # Root/Charly console sign-in alerts in every enabled region
@@ -136,12 +136,15 @@ tools/                      # Asset builders and offline cache-buster checker/te
   real image, so phones and tablets (where it's hidden) don't download it.
 - The reCAPTCHA badge is hidden with `visibility: hidden`. That's only allowed because the
   attribution text is shown next to the form, so keep that text.
-- CSP is initially **report-only**, defined in `infra/csp-policy.txt` and attached through
-  CloudFront's custom response headers. A new library/host needs a policy review; changing an
+- CSP is **enforced** (`Content-Security-Policy`), defined in `infra/csp-policy.txt` and attached
+  through CloudFront's custom response headers. Anything it doesn't allow is blocked in the
+  browser, so a new library/host needs a policy update in the same change, and changing an
   executable inline script needs its SHA-256 hash updated. `tools/check_csp.py` checks all pages.
   Typed.js must keep `autoInsertCss: false`; cursor CSS belongs in SCSS. No reporting endpoint
-  is configured: inspect browser violations with `tools/check_csp_browser.py`. Move to enforcing
-  CSP only in a separate approved change after a clean live report-only period (about a week).
+  is configured: inspect browser violations with `tools/check_csp_browser.py` (Chromium by
+  default, `--browser firefox|webkit`, `--report-only` for the report-only header). The policy
+  change and the page change ship separately (Terraform apply vs deploy): apply a widened policy
+  before deploying pages that need it, and narrow it only after the deploy.
 
 ## Rules for changes
 

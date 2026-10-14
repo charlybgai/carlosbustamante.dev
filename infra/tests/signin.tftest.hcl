@@ -198,3 +198,29 @@ run "site_health_alarm" {
     error_message = "The site health alarm must watch HTTPS on the apex domain and fire when the check reports unhealthy."
   }
 }
+
+run "csp_is_enforced" {
+  command = plan
+
+  override_resource {
+    target          = aws_api_gateway_stage.prod
+    override_during = plan
+    values          = { invoke_url = "https://abc123.execute-api.us-east-1.amazonaws.com/prod" }
+  }
+
+  assert {
+    condition = anytrue([
+      for item in one(aws_cloudfront_response_headers_policy.security.custom_headers_config).items :
+      item.header == "Content-Security-Policy" && item.value == local.content_security_policy
+    ])
+    error_message = "CloudFront must send the policy as an enforced Content-Security-Policy header."
+  }
+
+  assert {
+    condition = !anytrue([
+      for item in one(aws_cloudfront_response_headers_policy.security.custom_headers_config).items :
+      item.header == "Content-Security-Policy-Report-Only"
+    ])
+    error_message = "Don't send a report-only CSP alongside the enforced one."
+  }
+}
